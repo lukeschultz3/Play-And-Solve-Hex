@@ -27,7 +27,7 @@ class Hex:
 
         return string
 
-    def play_move(self, move, player = None):
+    def play_move(self, move, player=None):
         assert(self.legal_moves[move[0]][move[1]])  # fail if illegal move
 
         if player != None:  # specific player given
