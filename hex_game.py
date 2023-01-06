@@ -7,29 +7,37 @@ from copy import deepcopy
 # board constants
 BLANK = 0
 BLACK = 1
-WHITE = 2
+WHITE = -1
 BORDER = 3
 
 
 class Hex:
-    def __init__(self, size):
+    def __init__(self, size: int):
         self.size = size
         self.board = [[BLANK for i in range(size)] for i in range(size)]
         self.legal_moves = [[True for i in range(size)] for i in range(size)]
         self.current_player = BLACK
 
-    def __str__(self):
+    def __str__(self) -> str:
         """ get string representation of board """
         string = ""
         for i in range(self.size):
             string += " " * i
             for j in range(self.size):
-                string += str(self.board[i][j]) + " "
+                if self.board[i][j] == BLACK:
+                    string += "x "
+                elif self.board[i][j] == WHITE:
+                    string += "o "
+                elif self.board[i][j] == BLANK:
+                    string += ". "
+                else:
+                    string += str(self.board[i][j]) + " "
             string += "\n"
 
         return string
 
-    def get_legal_moves(self):
+    def get_legal_moves(self) -> list:
+        """ get list of legal moves """
         legal_moves = []
         for i in range(self.size):
             for j in range(self.size):
@@ -37,31 +45,24 @@ class Hex:
                     legal_moves.append([i,j])
         return legal_moves
 
-    def play_move(self, move, player=None):
+    def play_move(self, move:int, player: int=None) -> bool:
+        """ play a move and update the current player
+        return True if the move won the game """
         assert(self.legal_moves[move[0]][move[1]])  # fail if illegal move
 
         if player != None:  # specific player given
             self.board[move[0]][move[1]] = player
-            self.legal_moves[move[0]][move[1]] = False
-
-            if player == BLACK:  # TODO: one liner
-                self.current_player = WHITE
-            else:
-                self.current_player = BLACK
         else:
             self.board[move[0]][move[1]] = self.current_player
-            self.legal_moves[move[0]][move[1]] = False
 
-            if self.current_player == BLACK:
-                self.current_player = WHITE
-            else:
-                self.current_player = BLACK
+        self.legal_moves[move[0]][move[1]] = False
+        self.current_player *= -1  # switch player
 
         win = self._check_win(move)
-        
         return win
 
-    def _get_neighbours(self, move):
+    def _get_neighbours(self, move: int) -> list:
+        """ get list of neighbouring tiles """
         neighbours = [[move[0],   move[1]-1],
                       [move[0]+1, move[1]-1],
                       [move[0]-1, move[1]],
@@ -71,12 +72,14 @@ class Hex:
 
         return neighbours
 
-    def _check_win(self, move):
+    def _check_win(self, move) -> int:
+        """ do a DFS search on adjacent tiles of same color to see if move
+        touches both sides of it's color (win condition) """
         assert(self.board[move[0]][move[1]] == BLACK
                    or self.board[move[0]][move[1]] == WHITE)
 
         stack = [move]  # maintains list of moves
-        visited = {str(move)}
+        visited = {str(move)}  # don't add already searched moves to stack
         color = self.board[move[0]][move[1]]
 
         touch_left = False   # is a move found on left side for player?
@@ -121,7 +124,6 @@ class Hex:
         game_copy.current_player = self.current_player
 
         return game_copy
-
 
 
 if __name__=="__main__":
