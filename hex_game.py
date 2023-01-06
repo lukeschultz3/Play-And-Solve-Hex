@@ -1,6 +1,8 @@
 # Created by Luke Schultz
 # December 16, 2022
 
+from copy import deepcopy
+
 
 # board constants
 BLANK = 0
@@ -26,6 +28,14 @@ class Hex:
             string += "\n"
 
         return string
+
+    def get_legal_moves(self):
+        legal_moves = []
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.legal_moves[i][j]:
+                    legal_moves.append([i,j])
+        return legal_moves
 
     def play_move(self, move, player=None):
         assert(self.legal_moves[move[0]][move[1]])  # fail if illegal move
@@ -103,6 +113,15 @@ class Hex:
                         visited.add(str(n))
 
         return False
+
+    def copy(self):
+        game_copy = Hex(self.size)
+        game_copy.board = deepcopy(self.board)
+        game_copy.legal_moves = deepcopy(self.legal_moves)
+        game_copy.current_player = self.current_player
+
+        return game_copy
+
 
 
 if __name__=="__main__":
