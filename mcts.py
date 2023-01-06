@@ -1,36 +1,31 @@
-import time, sys
-
+import time, random
 from math import sqrt, log
-import random
 
 import hex_game
 from hex_game import ( BLACK, WHITE )
 
 class TreeNode:
-    def __init__(self, game, color, move=None, parent=None):
-        self.color = color  # player to move
-        self.game = game
-        self.move = move
-        self.parent = parent
+    def __init__(self, game: hex_game.Hex, color, move=None, parent=None):
+        self.color = color    # player who needs to make move
+        self.game = game      # hex_game Hex object
+        self.move = move      # previous move
+        self.parent = parent  # parent node, None if root
 
         self.wins = 0  # number of winning simulations
         self.sims = 0  # number of simulations
 
-        self.generated_children = False  # True after generate_children in run
-        self.children = []
+        self.generated_children = False  # true if node has been expanded
+        self.children = []               # list of child nodes
 
         # legal moves from this position
         self.moves = self.game.get_legal_moves()
 
-    def generate_children(self):
+    def generate_children(self) -> list:
         """ function to generate children of this mode """
         for move in self.moves:
             game_copy = self.game.copy()
             game_copy.play_move(move, self.color)
-            if self.color == BLACK:
-                self.children.append(TreeNode(game_copy, WHITE, move, self))
-            else:
-                self.children.append(TreeNode(game_copy, BLACK, move, self))
+            self.children.append(TreeNode(game_copy, -1*self.color, move, self))
 
         self.generated_children = True
         return self.children
@@ -39,16 +34,15 @@ class TreeNode:
         """ recursive function to run a simulation
         selects moves uniformly random """
 
-        #self.sims += 1
-
         if len(self.moves) == 0:
-            return True
+            # color player lost
+            return False
 
         game_copy = self.game.copy()
         color = self.color
         moves = game_copy.get_legal_moves()
         while len(moves) > 0:
-            move_index = random.randint(0, len(moves)-1)
+            move_index = random.randint(0, len(moves)-1)  # select random move
             won = game_copy.play_move(moves[move_index], color)
 
             if won:
@@ -56,15 +50,14 @@ class TreeNode:
 
             moves[move_index] = moves[-1]
             moves.pop()
-            if color == BLACK:
-                color = WHITE
-            else:
-                color = BLACK
+            color *= -1  # invert color
 
         if color != self.color:
+            # color player won
             return True
-
-        return False
+        else:
+            # color player lost
+            return False
 
 class Mcts:
     # MCTS code largely taken from
@@ -72,16 +65,9 @@ class Mcts:
     # November 27, 2022
 
     def __init__(self, board, color):
-        #self.root_node = TreeNode(board, color)
-        if color == BLACK:
-            #self.root_node = TreeNode(board, WHITE)
-            self.root_node = TreeNode(board, BLACK)
-        else:
-            #self.root_node = TreeNode(board, BLACK)
-            self.root_node = TreeNode(board, WHITE)
+        self.root_node = TreeNode(board, color)
         self.root_node.generate_children()
 
-        self.stats = {}  # [ number of wins, number of sims ]
         self.c = 0.4  # used for UCT
 
     def get_best_move(self):
@@ -110,7 +96,6 @@ class Mcts:
         end_time = time.time() + 15
 
         while time.time() < end_time:
-        #for i in range(10):
             leaf = self.traverse(self.root_node)  # traverse
             won = leaf.rollout()  # rollout
 
@@ -143,8 +128,7 @@ class Mcts:
         """
 
         if len(node.moves) == 0:
-            # if node is terminal, return node
-            return node
+            return node  # if terminal node, return node
 
         best_uct = None
         best_child = None
