@@ -8,7 +8,7 @@ executes main.py which starts the CLI
 | Command | Description | Example |
 | --- | --- | --- |
 | `x <x coord> <y coord>` | makes x move at (x, y) | `x 3 5` |
-| `o <x coord> <y coord>` | makes o move at (x, y) | `0 2 0` |
+| `o <x coord> <y coord>` | makes o move at (x, y) | `o 2 0` |
 | `show` | prints the board | |
 | `size <dimention>` | sets the board size, and resets the game | `size 7` |
 | `reset`| resets the game | |
