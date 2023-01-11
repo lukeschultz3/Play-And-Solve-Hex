@@ -84,6 +84,7 @@ class Mcts:
                 best_node = node
                 most_visits = node.sims
 
+        print("number of simulations performed:", self.root_node.sims)
         return best_node.move
 
     def monte_carlo_tree_search(self):
