@@ -60,6 +60,12 @@ class Hex:
 
         win = self._check_win(move)
         return win
+    
+    def clear_move(self, move:int):
+        """ set a tile to BLANK,
+        used for clearing a move """
+        self.board[move[0]][move[1]] = BLANK
+        self.legal_moves[move[0]][move[1]] = True
 
     def _get_neighbours(self, move: int) -> list:
         """ get list of neighbouring tiles """
