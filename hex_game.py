@@ -20,9 +20,21 @@ class Hex:
 
     def __str__(self) -> str:
         """ get string representation of board """
-        string = ""
+        string = " "
+
         for i in range(self.size):
-            string += " " * i
+            if i < 8:
+                string += chr(97+i) + " "
+            else:
+                string += chr(97+i+1) + " "
+        string += "\n"
+
+        for i in range(self.size):
+            if i < 9:  # single digit coord
+                string += " " * (i) + str(i+1) + " "
+            else:  # double digit coord
+                string += " " * (i-1) + str(i+1) + " "
+
             for j in range(self.size):
                 if self.board[i][j] == BLACK:
                     string += "x "
