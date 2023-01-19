@@ -1,6 +1,6 @@
 import hex_game
 from hex_game import BLACK, WHITE, BLANK
-from mcts import Mcts
+import mcts0
 
 size = 3
 previous_game = None
@@ -55,16 +55,16 @@ def command_loop(game):
             elif args[0] == "undo":
                 game = previous_game
                 print(str(game))
-            elif args[0] == "mcts":
+            elif args[0] == "mcts0":
                 if args[1] == "x":
                     previous_game = game.copy()
-                    mcts = Mcts(game, BLACK)
+                    mcts = mcts0.Mcts(game, BLACK)
                     move = mcts.monte_carlo_tree_search()
                     game.play_move(move, BLACK)
                     print(str(game))
                 elif args[1] == "o":
                     previous_game = game.copy()
-                    mcts = Mcts(game, WHITE)
+                    mcts = mcts0.Mcts(game, WHITE)
                     move = mcts.monte_carlo_tree_search()
                     game.play_move(move, WHITE)
                     print(str(game))
