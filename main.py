@@ -20,7 +20,7 @@ def coord_to_move(coord: str) -> list:
 
 def command_loop(game):
     command = None
-    while command != "exit" and command != "quit":
+    while command != "exit" and command != "quit" and command != "q":
         print("= ", end="")
         command = input().lower()
         
