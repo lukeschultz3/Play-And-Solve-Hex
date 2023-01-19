@@ -20,7 +20,7 @@ class TreeNode:
         # legal moves from this position
         self.moves = self.game.get_legal_moves()
 
-    def generate_children(self) -> list:
+    def generate_children(self):
         """ function to generate children of this mode """
         for move in self.moves:
             game_copy = self.game.copy()
@@ -28,7 +28,6 @@ class TreeNode:
             self.children.append(TreeNode(game_copy, -1*self.color, move, self))
 
         self.generated_children = True
-        return self.children
 
     def rollout(self) -> bool:
         """ recursive function to run a simulation
@@ -59,14 +58,30 @@ class TreeNode:
             # color player lost
             return False
 
+
+class RootNode(TreeNode):
+    def generate_children(self):
+        """ function to generate children of this mode 
+        returns winning move, if one is found """
+        for move in self.moves:
+            game_copy = self.game.copy()
+            won = game_copy.play_move(move, self.color)
+            if won:
+                return move
+            self.children.append(TreeNode(game_copy, -1*self.color, move, self))
+
+        self.generated_children = True
+        return None
+
+
 class Mcts:
     # MCTS code largely taken from
     # https://www.geeksforgeeks.org/ml-monte-carlo-tree-search-mcts/
     # November 27, 2022
 
     def __init__(self, board, color):
-        self.root_node = TreeNode(board, color)
-        self.root_node.generate_children()
+        self.root_node = RootNode(board, color)
+        self.winning_move = self.root_node.generate_children()
 
         self.c = 0.4  # used for UCT
 
@@ -84,7 +99,6 @@ class Mcts:
                 best_node = node
                 most_visits = node.sims
 
-        print("number of simulations performed:", self.root_node.sims)
         return best_node.move
 
     def monte_carlo_tree_search(self):
@@ -93,6 +107,11 @@ class Mcts:
         Returns:
             best_move: most visited move
         """
+
+        if self.winning_move != None:
+            print("number of simulations performed:", self.root_node.sims)
+            return self.winning_move
+
         # return move after set amount of time
         end_time = time.time() + 15
 
@@ -112,6 +131,7 @@ class Mcts:
 
                 node = node.parent
 
+        print("number of simulations performed:", self.root_node.sims)
         return self.get_best_move()
 
     def best_uct(self, node: TreeNode) -> TreeNode:
