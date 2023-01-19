@@ -1,4 +1,5 @@
 import hex_game
+import hex_game1
 from hex_game import BLACK, WHITE, BLANK
 import mcts0
 
@@ -73,5 +74,5 @@ def command_loop(game):
 
 
 if __name__=="__main__":
-    game = hex_game.Hex(size)
+    game = hex_game1.Hex(size)
     command_loop(game)
