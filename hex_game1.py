@@ -1,5 +1,6 @@
 # Created by Luke Schultz
 # December 16, 2022
+# January 19, 2023
 
 from copy import deepcopy
 import numpy as np
@@ -24,7 +25,6 @@ class Hex:
         for i in range(1, self.side_length+2):
             self.board[i*(self.side_length+1)-1] = BORDER
 
-        print(self.board)
         self.current_player = BLACK
 
     def __str__(self) -> str:
@@ -87,7 +87,6 @@ class Hex:
         else:
             self.board[move] = self.current_player
 
-        self.legal_moves[move] = False
         self.current_player *= -1  # switch player
 
         win = self._check_win(move)
@@ -100,12 +99,12 @@ class Hex:
 
     def _get_neighbours(self, move: int) -> list:
         """ get list of neighbouring tiles """
-        neighbours = [move-self.side_length,
-                      move-(self.side_length-1),
+        neighbours = [move-(self.side_length+1),
+                      move-self.side_length,
                       move-1,
                       move+1,
-                      move+(self.side_length-1),
-                      move+self.side_length]
+                      move+self.side_length,
+                      move+self.side_length+1]
 
         return neighbours
 
@@ -123,22 +122,27 @@ class Hex:
 
         while len(stack) > 0:
             cur_move = stack.pop()
+            normalized_move = cur_move - self.side_length
 
             if color == BLACK:
-                if cur_move % self.side_length == 0:
+                #if cur_move % self.side_length == 0:
+                if normalized_move // (self.side_length+1) == 0:
                     if touch_right == True:
                         return True
                     touch_left = True
-                elif cur_move % self.side_length == self.side_length-1:
+                #elif cur_move % self.side_length == self.side_length-1:
+                elif normalized_move // (self.side_length+1) == self.side_length-1:
                     if touch_left == True:
                         return True
                     touch_right = True
             else:
-                if cur_move // self.side_length == 0:
+                #if cur_move // self.side_length == 0:
+                if normalized_move % (self.side_length+1) == 1:
                     if touch_right == True:
                         return True
                     touch_left = True
-                elif cur_move // self.side_length == self.side_length-1:
+                #elif cur_move // self.side_length == self.side_length-1:
+                elif normalized_move % (self.side_length+1) == self.side_length:
                     if touch_left == True:
                         return True
                     touch_right = True
@@ -146,11 +150,17 @@ class Hex:
             neighbours = self._get_neighbours(cur_move)
 
             for n in neighbours:
+                if not str(n) in visited and self.board[n] == color:
+                    stack.append(n)
+                    visited.add(str(n))
+
+                """
                 if (n >= 0 and n < self.side_length
                         and n // self.side_length >= 0 and n // self.side_length < self.side_length):
                     if not str(n) in visited and self.board[n] == color:
                         stack.append(n)
                         visited.add(str(n))
+                """
 
         return False
 
@@ -160,29 +170,3 @@ class Hex:
         game_copy.current_player = self.current_player
 
         return game_copy
-
-
-if __name__=="__main__":
-    game = Hex(3)
-    print(str(game))
-
-    print(game.play_move([2,2]))
-    print(str(game))
-
-    print(game.play_move([2,0]))
-    print(str(game))
-
-    print(game.play_move([1,1]))
-    print(str(game))
-
-    print(game.play_move([0,2]))
-    print(str(game))
-
-    print(game.play_move([0,1]))
-    print(str(game))
-
-    print(game.play_move([2,1]))
-    print(str(game))
-
-    print(game.play_move([1,2]))
-    print(str(game))
