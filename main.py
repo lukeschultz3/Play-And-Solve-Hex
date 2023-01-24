@@ -3,6 +3,8 @@ import hex_game1
 from hex_game import BLACK, WHITE, BLANK
 import mcts0
 
+import cProfile
+
 size = 3
 previous_game = None
 
@@ -56,11 +58,13 @@ def command_loop(game):
             elif args[0] == "undo":
                 game = previous_game
                 print(str(game))
-            elif args[0] == "mcts0":
+            elif args[0] == "mcts":
                 if args[1] == "x":
                     previous_game = game.copy()
                     mcts = mcts0.Mcts(game, BLACK)
                     move = mcts.monte_carlo_tree_search()
+                    #cProfile.runctx('mcts.monte_carlo_tree_search()', globals(), locals())
+                    #exit()
                     game.play_move(move, BLACK)
                     print(str(game))
                 elif args[1] == "o":
