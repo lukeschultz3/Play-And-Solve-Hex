@@ -1,12 +1,13 @@
-import hex_game
+import hex_game0
 import hex_game1
-from hex_game import BLACK, WHITE, BLANK
+from hex_game0 import BLACK, WHITE, BLANK
 import mcts0
 
 import cProfile
 
-size = 3
+size = 8
 previous_game = None
+version = 0
 
 def coord_to_move(coord: str) -> list:
     """convert coord in the form a1 to list index"""
@@ -51,13 +52,21 @@ def command_loop(game):
             elif args[0] == "size":
                 global size
                 size = int(args[1])
-                game = hex_game.Hex(size)
+                if version == 0:
+                    game = hex_game0.Hex(size)
+                elif version == 1:
+                    game = hex_game1.Hex(size)
             elif args[0] == "reset":
                 previous_game = game.copy()
-                game = hex_game.Hex(size)
+                if version == 0:
+                    game = hex_game0.Hex(size)
+                elif version == 1:
+                    game = hex_game1.Hex(size)
             elif args[0] == "undo":
                 game = previous_game
                 print(str(game))
+            elif args[0] == "version":
+                pass
             elif args[0] == "mcts":
                 if args[1] == "x":
                     previous_game = game.copy()
@@ -78,5 +87,8 @@ def command_loop(game):
 
 
 if __name__=="__main__":
-    game = hex_game1.Hex(size)
+    if version == 0:
+        game = hex_game0.Hex(size)
+    elif version == 1:
+        game = hex_game1.Hex(size)
     command_loop(game)

@@ -15,7 +15,6 @@ class Hex:
     def __init__(self, size: int):
         self.size = size
         self.board = [[BLANK for i in range(size)] for i in range(size)]
-        self.legal_moves = [[True for i in range(size)] for i in range(size)]
         self.current_player = BLACK
 
     def __str__(self) -> str:
@@ -51,23 +50,22 @@ class Hex:
     def get_legal_moves(self) -> list:
         """ get list of legal moves """
         legal_moves = []
-        for i in range(self.size):
-            for j in range(self.size):
-                if self.legal_moves[i][j]:
+        for i in range(len(self.board)):
+            for j in range (len(self.board[i])):
+                if self.board[i][j] == BLANK:
                     legal_moves.append([i,j])
         return legal_moves
 
     def play_move(self, move:int, player: int=None) -> bool:
         """ play a move and update the current player
         return True if the move won the game """
-        assert(self.legal_moves[move[0]][move[1]])  # fail if illegal move
+        assert(self.board[move[0]][move[1]] == BLANK)  # fail if illegal move
 
         if player != None:  # specific player given
             self.board[move[0]][move[1]] = player
         else:
             self.board[move[0]][move[1]] = self.current_player
 
-        self.legal_moves[move[0]][move[1]] = False
         self.current_player *= -1  # switch player
 
         win = self._check_win(move)
@@ -138,7 +136,6 @@ class Hex:
     def copy(self):
         game_copy = Hex(self.size)
         game_copy.board = deepcopy(self.board)
-        game_copy.legal_moves = deepcopy(self.legal_moves)
         game_copy.current_player = self.current_player
 
         return game_copy

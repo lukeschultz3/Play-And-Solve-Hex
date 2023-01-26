@@ -1,11 +1,10 @@
 import time, random
 from math import sqrt, log
 
-import hex_game
-from hex_game import ( BLACK, WHITE )
+import hex_game0
 
 class TreeNode:
-    def __init__(self, game: hex_game.Hex, color, move=None, parent=None):
+    def __init__(self, game: hex_game0.Hex, color, move=None, parent=None):
         self.color = color    # player who needs to make move
         self.game = game      # hex_game Hex object
         self.move = move      # previous move
