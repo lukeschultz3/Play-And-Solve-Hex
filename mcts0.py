@@ -130,7 +130,6 @@ class Mcts:
 
                 node = node.parent
 
-        print("number of simulations performed:", self.root_node.sims)
         return self.get_best_move()
 
     def best_uct(self, node: TreeNode) -> TreeNode:
