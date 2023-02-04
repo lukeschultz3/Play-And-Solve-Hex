@@ -13,7 +13,7 @@ WHITE = -1
 BORDER = 3
 
 
-class Hex:
+class Hex1:
     def __init__(self, board_side_len: int):
         self.board_side_len = board_side_len
         self.side_len_with_buffer = board_side_len + 1
@@ -160,7 +160,7 @@ class Hex:
         return False
 
     def copy(self):
-        game_copy = Hex(self.board_side_len)
+        game_copy = Hex1(self.board_side_len)
         game_copy.board = deepcopy(self.board)
         game_copy.current_player = self.current_player
 

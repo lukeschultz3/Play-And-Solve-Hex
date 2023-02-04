@@ -8,7 +8,7 @@ import cProfile
 
 size = 8
 previous_game = None
-version = "0"  # "0" or "1" or "1.1"
+version = "1.1"  # "0" or "1" or "1.1"
 
 def coord_to_move(coord: str) -> list:
     """convert coord in the form a1 to list index"""
@@ -55,16 +55,16 @@ def command_loop(game):
                 size = int(args[1])
                 if version == "0":
                     game = hex_game0.Hex(size)
-                elif version == "1.0" or "1":
-                    game = hex_game1.Hex(size)
+                elif version == "1.0" or version == "1":
+                    game = hex_game1.Hex1(size)
                 elif version == "1.1":
                     game = hex_game1_1.Hex1_1(size)
             elif args[0] == "reset":
                 previous_game = game.copy()
                 if version == "0":
                     game = hex_game0.Hex(size)
-                elif version == "1.0" or "1":
-                    game = hex_game1.Hex(size)
+                elif version == "1.0" or version == "1":
+                    game = hex_game1.Hex1(size)
                 elif version == "1.1":
                     game = hex_game1_1.Hex1_1(size)
             elif args[0] == "undo":
@@ -92,10 +92,11 @@ def command_loop(game):
 
 
 if __name__=="__main__":
+    print("version: ", version)
     if version == "0":
         game = hex_game0.Hex(size)
-    elif version == "1.0" or "1":
-        game = hex_game1.Hex(size)
+    elif version == "1.0" or version == "1":
+        game = hex_game1.Hex1(size)
     elif version == "1.1":
         game = hex_game1_1.Hex1_1(size)
     command_loop(game)

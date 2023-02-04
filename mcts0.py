@@ -1,10 +1,9 @@
 import time, random
 from math import sqrt, log
 
-import hex_game0
 
 class TreeNode:
-    def __init__(self, game: hex_game0.Hex, color, move=None, parent=None):
+    def __init__(self, game, color, move=None, parent=None):
         self.color = color    # player who needs to make move
         self.game = game      # hex_game Hex object
         self.move = move      # previous move
@@ -78,8 +77,8 @@ class Mcts:
     # https://www.geeksforgeeks.org/ml-monte-carlo-tree-search-mcts/
     # November 27, 2022
 
-    def __init__(self, board, color):
-        self.root_node = RootNode(board, color)
+    def __init__(self, game, color):
+        self.root_node = RootNode(game, color)
         self.winning_move = self.root_node.generate_children()
 
         self.c = 0.4  # used for UCT

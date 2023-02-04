@@ -14,7 +14,7 @@ BORDER = 3
 class Hex:
     def __init__(self, size: int):
         self.size = size
-        self.board = [[BLANK for i in range(size)] for i in range(size)]
+        self.board = [[BLANK for i in range(size)] for j in range(size)]
         self.current_player = BLACK
 
     def __str__(self) -> str:
