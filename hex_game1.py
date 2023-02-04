@@ -27,7 +27,7 @@ class Hex1:
         self.board[len(self.board)-self.board_side_len-1:] = BORDER
         for i in range(1, self.board_side_len+2):
             self.board[i*(self.side_len_with_buffer)-1] = BORDER
-
+        
         self.current_player = BLACK
 
     def __str__(self) -> str:
@@ -88,6 +88,10 @@ class Hex1:
     def play_move(self, move:int, player: int=None) -> bool:
         """ play a move and update the current player
         return True if the move won the game """
+
+        if type(move) is list:  # 2d list
+            temp_move = (move[0]+1) * self.side_len_with_buffer + move[1]
+            move = temp_move
 
         if player != None:  # specific player given
             self.board[move] = player

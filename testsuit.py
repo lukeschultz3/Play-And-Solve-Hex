@@ -45,7 +45,6 @@ def play(game_version1, game_version2, size, num_games):
                 won = game1.play_move(move)
                 game2.play_move(move)
                 print(str(game1))
-                print(str(game2))
 
                 if won and i % 2 == 0:
                     win_count[0] += 1
@@ -57,7 +56,6 @@ def play(game_version1, game_version2, size, num_games):
                 won = game2.play_move(move)
                 game1.play_move(move)
                 print(str(game1))
-                print(str(game2))
 
                 if won and i % 2 == 0:
                     win_count[1] += 1
@@ -65,7 +63,8 @@ def play(game_version1, game_version2, size, num_games):
                     win_count[0] += 1    
             
             player = 3 - player  # alternate player
+    print(win_count)
 
 
 #sim_count_test(1, 8)
-play(games[0], games[1], 8, 1)
+play(games[0], games[1], 8, 4)

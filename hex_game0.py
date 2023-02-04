@@ -56,10 +56,16 @@ class Hex:
                     legal_moves.append([i,j])
         return legal_moves
 
-    def play_move(self, move:int, player: int=None) -> bool:
+    def play_move(self, move, player: int=None) -> bool:
         """ play a move and update the current player
         return True if the move won the game """
-        assert(self.board[move[0]][move[1]] == BLANK)  # fail if illegal move
+        #assert(self.board[move[0]][move[1]] == BLANK)  # fail if illegal move
+
+        if type(move) is int:  # 1d move
+            temp_move = [None, None]
+            temp_move[0] = (move // (self.size+1)) - 1
+            temp_move[1] = move % (self.size+1)
+            move = temp_move
 
         if player != None:  # specific player given
             self.board[move[0]][move[1]] = player
