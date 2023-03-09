@@ -1,158 +1,176 @@
 # Created by Luke Schultz
-# December 16, 2022
-# January 19, 2023
+# Winter 2023
+#
+# Board Representation:
+# 3 1 1 1 3
+# 2 0 0 0 2
+# 2 0 0 0 2
+# 2 0 0 0 2
+# 3 1 1 1 3
+# Where BORDER = 3, BLACK = 1, WHITE = 2, BLANK = 0
+
 
 from copy import deepcopy
 import numpy as np
 
 
-# board constants
+# board constant
 BLANK = 0
 BLACK = 1
-WHITE = -1
+WHITE = 2
 BORDER = 3
 
 
-class Hex1:
-    def __init__(self, board_side_len: int):
-        self.board_side_len = board_side_len
-        self.side_len_with_buffer = board_side_len + 1
-        self.game_size = board_side_len ** 2
-        self.board_size = (self.board_side_len+2) * self.side_len_with_buffer
-
+class Hex1_2:
+    def __init__(self, game_dim: int):
+        self.game_dim = game_dim  # Side length of the game
+        self.board_dim = self.game_dim + 2  # Side length of the array repr
+        self.board_size = self.board_dim ** 2
         self.board = np.array([BLANK] * self.board_size)
 
-        # add borders
-        self.board[0:self.side_len_with_buffer] = BORDER
-        self.board[len(self.board)-self.board_side_len-1:] = BORDER
-        for i in range(1, self.board_side_len+2):
-            self.board[i*(self.side_len_with_buffer)-1] = BORDER
-        
+        # Set corners to be borders
+        self.board[0] = BORDER
+        self.board[self.board_dim-1] = BORDER
+        self.board[-self.board_dim] = BORDER
+        self.board[-1] = BORDER
+
+        # Set BLACK sides to contain BLACK pieces
+        self.board[1:self.board_dim-1] = BLACK  # Left/top
+        self.board[self.board_size-self.game_dim-1:-1] = BLACK  # Right/bottom
+
+        # Set WHITE sides to contain WHITE pieces
+        for i in range(self.board_dim,
+                       self.board_dim*(self.board_dim-1),
+                       self.board_dim):  # Left side
+            self.board[i] = WHITE
+        for i in range((self.board_dim*2)-1,
+                       self.board_dim*(self.board_dim-1),
+                       self.board_dim):  # Right side
+            self.board[i] = WHITE
+
         self.current_player = BLACK
 
     def __str__(self) -> str:
-        """ get string representation of board """
-        string = " "
+        """Returns string representation of board."""
 
-        for i in range(self.board_side_len):
-            if i < 8:
-                string += chr(97+i) + " "
-            else:
-                string += chr(97+i+1) + " "
+        char_reprs = {BLACK: "x", WHITE: "o", BORDER: "~", BLANK: "."}
+        string = "  "
+        for i in range(0, self.game_dim):
+            string += chr(i+97) + " "
         string += "\n"
+        for i in range(1, self.board_dim-1):
+            string += " " * i
+            string += str(i) + " "
 
-        i = self.side_len_with_buffer
-        added_so_far = 0
-        while added_so_far < self.game_size:
-            if added_so_far % self.board_side_len == 0:
-                if added_so_far // self.board_side_len < 9:  # single digit coord
-                    string += (" " * (added_so_far//self.board_side_len)
-                               + str((added_so_far//self.board_side_len)+1)
-                               + " ")
-                else:  # double digit coord
-                    string += (" " * ((added_so_far//self.board_side_len)-1)
-                               + str((added_so_far//self.board_side_len)+1)
-                               + " ")
-
-            if self.board[i] == BORDER:
-                pass
-            elif self.board[i] == BLACK:
-                string += "x "
-                added_so_far += 1
-            elif self.board[i] == WHITE:
-                string += "o "
-                added_so_far += 1
-            elif self.board[i] == BLANK:
-                string += ". "
-                added_so_far += 1
-            else:
-                string += str(self.board[i])
-                added_so_far += 1
-
-            if added_so_far % self.board_side_len == 0:
-                i += 2
-                string += "\n"
-            else:
-                i += 1
+            for j in range(1, self.board_dim-1):
+                string += char_reprs[self.board[(i*self.board_dim)+j]] + " "
+            string += "\n"
 
         return string
-                    
+
+    def _2d_to_1d(self, index: list) -> int:
+        """Converts 2d position to 1d position."""
+        return (index[0]+1) * self.board_dim + index[1]+1
+
     def get_legal_moves(self) -> list:
-        """ get list of legal moves """
+        """Returns list of legal moves."""
+
+        # TODO optimize
         legal_moves = []
         for i in range(len(self.board)):
             if self.board[i] == BLANK:
                 legal_moves.append(i)
         return legal_moves
 
-    def play_move(self, move:int, player: int=None) -> bool:
-        """ play a move and update the current player
-        return True if the move won the game """
+    def play_move(self, move: int, player: int = None) -> bool:
+        """
+        Play a move, update the current player, check for win.
 
-        if type(move) is list:  # 2d list
-            temp_move = (move[0]+1) * self.side_len_with_buffer + move[1]
-            move = temp_move
+        Parameters:
+        move (int): Position of move
+        player (int): WHITE or BLACK, player to move
 
-        if player != None:  # specific player given
-            self.board[move] = player
-        else:
-            self.board[move] = self.current_player
+        Returns:
+        bool: True if game has been won
+        """
 
-        self.current_player *= -1  # switch player
+        if type(move) is list:
+            move = self._2d_to_1d(move)
 
-        win = self._check_win(move)
-        return win
-    
-    def clear_move(self, move:int):
-        """ set a tile to BLANK,
-        used for clearing a move """
-        self.board[move] = BLANK
+        if player is None:
+            player = self.current_player
+
+        self.board[move] = player
+        self.current_player = 3 - self.current_player
+
+        return self._check_win(move)
+
+    def clear_move(self, pos: int):
+        """Set a tile at pos to BLANK."""
+
+        if type(pos) is list:
+            pos = self._2d_to_1d(pos)
+
+        self.board[pos] = BLANK
 
     def _get_neighbours(self, move: int) -> list:
-        """ get list of neighbouring tiles """
-        neighbours = [move-(self.board_side_len+1),
-                      move-self.board_side_len,
-                      move-1,
-                      move+1,
-                      move+self.board_side_len,
-                      move+self.board_side_len+1]
+        """Returns a list of neighbours for a given move."""
 
-        return neighbours
+        return [move-(self.board_dim),
+                move-(self.board_dim-1),
+                move-1,
+                move+1,
+                move+(self.board_dim-1),
+                move+(self.board_dim)]
 
-    def _check_win(self, move) -> int:
-        """ do a DFS search on adjacent tiles of same color to see if move
-        touches both sides of it's color (win condition) """
+    def _check_win(self, move: int) -> bool:
+        """
+        Check if the game has been won yet.
+
+        Does a DFS starting on move, moving to tiles of same color to
+        check if move touches both sides of its color (win condition).
+
+        Parameters:
+        move (int): Position of move
+
+        Returns:
+        bool: True if the game has been won by player who made move
+        """
+
         assert(self.board[move] == BLACK or self.board[move] == WHITE)
 
-        stack = [move]  # maintains list of moves
-        visited = {str(move)}  # don't add already searched moves to stack
+        stack = [move]
+        visited = {str(move)}  # Don't add already searched moves to stack
         color = self.board[move]
 
-        touch_left = False   # is a move found on left side for player?
-        touch_right = False  # is a move found on right side for player?
+        touch_left = False   # Is a move found on left side for player?
+        touch_right = False  # Is a move found on right side for player?
 
         while len(stack) > 0:
             cur_move = stack.pop()
-            normalized_move = cur_move - self.board_side_len
 
             if color == BLACK:
-                if normalized_move // (self.side_len_with_buffer) == 0:
-                    if touch_right == True:
+                if cur_move < self.board_dim:
+                    if touch_right:
                         return True
                     touch_left = True
-                elif normalized_move // (self.side_len_with_buffer) == self.board_side_len-1:
-                    if touch_left == True:
+                    continue
+                elif cur_move > self.board_size-self.board_dim:
+                    if touch_left:
                         return True
                     touch_right = True
+                    continue
             else:
-                if normalized_move % (self.side_len_with_buffer) == 1:
-                    if touch_right == True:
+                if cur_move % self.board_dim == 0:
+                    if touch_right:
                         return True
                     touch_left = True
-                elif normalized_move % (self.side_len_with_buffer) == self.board_side_len:
-                    if touch_left == True:
+                    continue
+                elif (cur_move+1) % self.board_dim == 0:
+                    if touch_left:
                         return True
                     touch_right = True
+                    continue
 
             neighbours = self._get_neighbours(cur_move)
 
@@ -163,8 +181,10 @@ class Hex1:
 
         return False
 
-    def copy(self):
-        game_copy = Hex1(self.board_side_len)
+    def copy(self) -> "Hex1_2":
+        """Return copy"""
+
+        game_copy = Hex1_2(self.game_dim)
         game_copy.board = deepcopy(self.board)
         game_copy.current_player = self.current_player
 
