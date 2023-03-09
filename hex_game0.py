@@ -1,6 +1,7 @@
 # Created by Luke Schultz
 # Fall 2022 / Winter 2023
 #
+# 2d list board representation.
 # Board Representation:
 # 0 0 0
 # 0 0 0
@@ -61,9 +62,9 @@ class Hex:
         # TODO optimize
         legal_moves = []
         for i in range(len(self.board)):
-            for j in range (len(self.board[i])):
+            for j in range(len(self.board[i])):
                 if self.board[i][j] == BLANK:
-                    legal_moves.append([i,j])
+                    legal_moves.append([i, j])
         return legal_moves
 
     def play_move(self, move: list, player: int = None) -> bool:
@@ -84,12 +85,11 @@ class Hex:
         if player is None:
             player = self.current_player
 
-
         self.board[move[0]][move[1]] = player
         self.current_player = 3 - self.current_player  # Switch player
 
         return self._check_win(move)
-    
+
     def clear_move(self, move: list):
         """Set a tile to BLANK."""
 
@@ -134,28 +134,30 @@ class Hex:
 
             if color == BLACK:
                 if cur_move[0] == 0:
-                    if touch_right == True:
+                    if touch_right:
                         return True
                     touch_left = True
                 elif cur_move[0] == self.size-1:
-                    if touch_left == True:
+                    if touch_left:
                         return True
                     touch_right = True
             else:
                 if cur_move[1] == 0:
-                    if touch_right == True:
+                    if touch_right:
                         return True
                     touch_left = True
                 elif cur_move[1] == self.size-1:
-                    if touch_left == True:
+                    if touch_left:
                         return True
                     touch_right = True
 
             neighbours = self._get_neighbours(cur_move)
 
             for n in neighbours:
-                if n[0] >= 0 and n[0] < self.size and n[1] >= 0 and n[1] < self.size:
-                    if not str(n) in visited and self.board[n[0]][n[1]] == color:
+                if (n[0] >= 0 and n[0] < self.size
+                        and n[1] >= 0 and n[1] < self.size):
+                    if (not str(n) in visited
+                            and self.board[n[0]][n[1]] == color):
                         stack.append(n)
                         visited.add(str(n))
 
@@ -171,27 +173,27 @@ class Hex:
         return game_copy
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     game = Hex(3)
     print(str(game))
 
-    print(game.play_move([2,2]))
+    print(game.play_move([2, 2]))
     print(str(game))
 
-    print(game.play_move([2,0]))
+    print(game.play_move([2, 0]))
     print(str(game))
 
-    print(game.play_move([1,1]))
+    print(game.play_move([1, 1]))
     print(str(game))
 
-    print(game.play_move([0,2]))
+    print(game.play_move([0, 2]))
     print(str(game))
 
-    print(game.play_move([0,1]))
+    print(game.play_move([0, 1]))
     print(str(game))
 
-    print(game.play_move([2,1]))
+    print(game.play_move([2, 1]))
     print(str(game))
 
-    print(game.play_move([1,2]))
+    print(game.play_move([1, 2]))
     print(str(game))

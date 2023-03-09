@@ -1,6 +1,7 @@
 # Created by Luke Schultz
 # Winter 2023
 #
+# 1d numpy array board representation.
 # Board Representation:
 # 3 1 1 1 3
 # 2 0 0 0 2
