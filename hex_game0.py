@@ -1,5 +1,12 @@
 # Created by Luke Schultz
-# December 16, 2022
+# Fall 2022 / Winter 2023
+#
+# Board Representation:
+# 0 0 0
+# 0 0 0
+# 0 0 0
+# Where BLANK = 0
+
 
 from copy import deepcopy
 
@@ -7,7 +14,7 @@ from copy import deepcopy
 # board constants
 BLANK = 0
 BLACK = 1
-WHITE = -1
+WHITE = 2
 BORDER = 3
 
 
@@ -18,7 +25,8 @@ class Hex:
         self.current_player = BLACK
 
     def __str__(self) -> str:
-        """ get string representation of board """
+        """Returns string representation of board."""
+
         string = " "
 
         for i in range(self.size):
@@ -29,9 +37,9 @@ class Hex:
         string += "\n"
 
         for i in range(self.size):
-            if i < 9:  # single digit coord
+            if i < 9:  # Single digit coord
                 string += " " * (i) + str(i+1) + " "
-            else:  # double digit coord
+            else:  # Double digit coord
                 string += " " * (i-1) + str(i+1) + " "
 
             for j in range(self.size):
@@ -48,7 +56,9 @@ class Hex:
         return string
 
     def get_legal_moves(self) -> list:
-        """ get list of legal moves """
+        """Returns list of legal moves."""
+
+        # TODO optimize
         legal_moves = []
         for i in range(len(self.board)):
             for j in range (len(self.board[i])):
@@ -56,56 +66,68 @@ class Hex:
                     legal_moves.append([i,j])
         return legal_moves
 
-    def play_move(self, move, player: int=None) -> bool:
-        """ play a move and update the current player
-        return True if the move won the game """
-        #assert(self.board[move[0]][move[1]] == BLANK)  # fail if illegal move
+    def play_move(self, move: list, player: int = None) -> bool:
+        """
+        Play a move, update the current player, check for win.
 
-        if type(move) is int:  # 1d move
-            temp_move = [None, None]
-            temp_move[0] = (move // (self.size+1)) - 1
-            temp_move[1] = move % (self.size+1)
-            move = temp_move
+        Parameters:
+        move(list): Position of move
+        player (int): WHITE or BLACK, player to move
 
-        if player != None:  # specific player given
-            self.board[move[0]][move[1]] = player
-        else:
-            self.board[move[0]][move[1]] = self.current_player
+        Returns:
+        bool: True if game has been won
+        """
 
-        self.current_player *= -1  # switch player
+        if type(move) is int:  # Convert 1d move to 2d
+            move = [move // (self.size+1), move % (self.size+1)]
 
-        win = self._check_win(move)
-        return win
+        if player is None:
+            player = self.current_player
+
+
+        self.board[move[0]][move[1]] = player
+        self.current_player = 3 - self.current_player  # Switch player
+
+        return self._check_win(move)
     
-    def clear_move(self, move:int):
-        """ set a tile to BLANK,
-        used for clearing a move """
+    def clear_move(self, move: list):
+        """Set a tile to BLANK."""
+
         self.board[move[0]][move[1]] = BLANK
-        self.legal_moves[move[0]][move[1]] = True
 
-    def _get_neighbours(self, move: int) -> list:
-        """ get list of neighbouring tiles """
-        neighbours = [[move[0],   move[1]-1],
-                      [move[0]+1, move[1]-1],
-                      [move[0]-1, move[1]],
-                      [move[0]+1, move[1]],
-                      [move[0]-1, move[1]+1],
-                      [move[0],   move[1]+1]]
+    def _get_neighbours(self, move: list) -> list:
+        """Returns a list of neighbouring tiles."""
 
-        return neighbours
+        return [[move[0],   move[1]-1],
+                [move[0]+1, move[1]-1],
+                [move[0]-1, move[1]],
+                [move[0]+1, move[1]],
+                [move[0]-1, move[1]+1],
+                [move[0],   move[1]+1]]
 
-    def _check_win(self, move) -> int:
-        """ do a DFS search on adjacent tiles of same color to see if move
-        touches both sides of it's color (win condition) """
+    def _check_win(self, move: list) -> int:
+        """
+        Check if the game has been won.
+
+        Does a DFS starting on move, moving to tiles of same color to
+        check if move touches both sides of its color (win condition).
+
+        Parameters:
+        move (int): Position of move
+
+        Returns:
+        bool: True if the game has been won by player who made move
+        """
+
         assert(self.board[move[0]][move[1]] == BLACK
-                   or self.board[move[0]][move[1]] == WHITE)
+               or self.board[move[0]][move[1]] == WHITE)
 
-        stack = [move]  # maintains list of moves
-        visited = {str(move)}  # don't add already searched moves to stack
+        stack = [move]
+        visited = {str(move)}  # Don't add already searched moves to stack
         color = self.board[move[0]][move[1]]
 
-        touch_left = False   # is a move found on left side for player?
-        touch_right = False  # is a move found on right side for player?
+        touch_left = False   # Is a move found on left side for player?
+        touch_right = False  # Is a move found on right side for player?
 
         while len(stack) > 0:
             cur_move = stack.pop()
@@ -139,7 +161,9 @@ class Hex:
 
         return False
 
-    def copy(self):
+    def copy(self) -> "Hex":
+        """Return copy"""
+
         game_copy = Hex(self.size)
         game_copy.board = deepcopy(self.board)
         game_copy.current_player = self.current_player

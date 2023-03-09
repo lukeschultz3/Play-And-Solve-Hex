@@ -21,7 +21,7 @@ WHITE = 2
 BORDER = 3
 
 
-class Hex1_2:
+class Hex1:
     def __init__(self, game_dim: int):
         self.game_dim = game_dim  # Side length of the game
         self.board_dim = self.game_dim + 2  # Side length of the array repr
@@ -101,7 +101,7 @@ class Hex1_2:
             player = self.current_player
 
         self.board[move] = player
-        self.current_player = 3 - self.current_player
+        self.current_player = 3 - self.current_player  # Switch player
 
         return self._check_win(move)
 
@@ -125,7 +125,7 @@ class Hex1_2:
 
     def _check_win(self, move: int) -> bool:
         """
-        Check if the game has been won yet.
+        Check if the game has been won.
 
         Does a DFS starting on move, moving to tiles of same color to
         check if move touches both sides of its color (win condition).
@@ -181,10 +181,10 @@ class Hex1_2:
 
         return False
 
-    def copy(self) -> "Hex1_2":
+    def copy(self) -> "Hex1":
         """Return copy"""
 
-        game_copy = Hex1_2(self.game_dim)
+        game_copy = Hex1(self.game_dim)
         game_copy.board = deepcopy(self.board)
         game_copy.current_player = self.current_player
 
