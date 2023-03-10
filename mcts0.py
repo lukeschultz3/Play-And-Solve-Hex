@@ -1,72 +1,88 @@
-import time, random
+# Created by Luke Schultz
+# Fall 2022, Winter 2023
+
+
+import time
+import random
 from math import sqrt, log
 
 
 class TreeNode:
-    def __init__(self, game, color, move=None, parent=None):
-        self.color = color    # player who needs to make move
-        self.game = game      # hex_game Hex object
-        self.move = move      # previous move
-        self.parent = parent  # parent node, None if root
+    def __init__(self, game, player: int, move=None, parent=None):
+        self.game = game      # Hex object
+        self.player = player  # Player to make move
+        self.move = move      # Previous move
+        self.parent = parent  # Parent node, None if root
 
-        self.wins = 0  # number of winning simulations
-        self.sims = 0  # number of simulations
+        self.wins = 0  # Number of winning simulations
+        self.sims = 0  # Number of simulations
 
-        self.generated_children = False  # true if node has been expanded
-        self.children = []               # list of child nodes
+        self.generated_children = False  # True if node has been expanded
+        self.children = []               # List of child nodes
 
-        # legal moves from this position
+        # Legal moves from this position
         self.moves = self.game.get_legal_moves()
 
     def generate_children(self):
-        """ function to generate children of this mode """
+        """Generate children of this mode."""
+
         for move in self.moves:
             game_copy = self.game.copy()
-            game_copy.play_move(move, self.color)
-            self.children.append(TreeNode(game_copy, -1*self.color, move, self))
+            game_copy.play_move(move, self.player)
+            self.children.append(
+                TreeNode(game_copy, 3-self.player, move, self)
+            )
 
         self.generated_children = True
 
     def rollout(self) -> bool:
-        """ recursive function to run a simulation
-        selects moves uniformly random """
+        """
+        Perform a simulation.
+        Selects moves uniformly random.
 
-        if len(self.moves) == 0:
-            # color player lost
-            return False
+        Returns:
+        bool: True if self.player won
+        """
 
         game_copy = self.game.copy()
-        color = self.color
+        player = self.player
         moves = game_copy.get_legal_moves()
         while len(moves) > 0:
-            move_index = random.randint(0, len(moves)-1)  # select random move
-            won = game_copy.play_move(moves[move_index], color)
+            move_index = random.randint(0, len(moves)-1)  # Select random move
+            won = game_copy.play_move(moves[move_index], player)
 
             if won:
                 break
 
             moves[move_index] = moves[-1]
             moves.pop()
-            color *= -1  # invert color
+            player = 3 - player  # invert color / switch player
 
-        if color != self.color:
-            # color player won
+        if player != self.player:  # self.player won
             return True
-        else:
-            # color player lost
+        else:  # self.player lost
             return False
 
 
 class RootNode(TreeNode):
     def generate_children(self):
-        """ function to generate children of this mode 
-        returns winning move, if one is found """
+        """
+        Generate children of this node.
+
+        Returns:
+        winning move, if one is found
+        """
+
         for move in self.moves:
             game_copy = self.game.copy()
-            won = game_copy.play_move(move, self.color)
+            won = game_copy.play_move(move, self.player)
+
             if won:
                 return move
-            self.children.append(TreeNode(game_copy, -1*self.color, move, self))
+
+            self.children.append(
+                TreeNode(game_copy, 3-self.player, move, self)
+            )
 
         self.generated_children = True
         return None
@@ -77,36 +93,38 @@ class Mcts:
     # https://www.geeksforgeeks.org/ml-monte-carlo-tree-search-mcts/
     # November 27, 2022
 
-    def __init__(self, game, color):
-        self.root_node = RootNode(game, color)
+    def __init__(self, game, player):
+        self.root_node = RootNode(game, player)
         self.winning_move = self.root_node.generate_children()
 
         self.c = 0.4  # used for UCT
 
     def get_best_move(self):
-        """ function to get best move, based on amount of times
-        it was chosen for simulation
+        """
+        Get most simulated move.
 
         Returns:
-            best move
+        move: most simulated move
         """
+
         best_node = None
         most_visits = None
         for node in self.root_node.children:
-            if most_visits == None or node.sims > most_visits:
+            if most_visits is None or node.sims > most_visits:
                 best_node = node
                 most_visits = node.sims
 
         return best_node.move
 
     def monte_carlo_tree_search(self):
-        """ function that runs monte carlo tree search
+        """
+        Perform Monte Carlo Tree Search.
 
         Returns:
             best_move: most visited move
         """
 
-        if self.winning_move != None:
+        if self.winning_move is not None:
             print("number of simulations performed:", self.root_node.sims)
             return self.winning_move
 
@@ -119,12 +137,12 @@ class Mcts:
 
             # backpropagate
             node = leaf
-            while node != None: 
+            while node is not None:
                 node.sims += 1
 
-                if won and node.color == leaf.color:
+                if won and node.player == leaf.player:
                     node.wins += 1
-                elif not won and node.color != leaf.color:
+                elif not won and node.player != leaf.player:
                     node.wins += 1
 
                 node = node.parent
@@ -132,17 +150,18 @@ class Mcts:
         return self.get_best_move()
 
     def best_uct(self, node: TreeNode) -> TreeNode:
-        """ function that finds next move for traversal,
-        if node is a root, will return node
-        if there is at least one child of node that has not been simulated on,
-            will return that child
-        otherwise, will return child with best uct score
+        """
+        Return the next move for traversal.
+
+        If node is a root, return node.
+        If there is a child of node that has not been simulated, return child.
+        Otherwise, return child with best uct score.
 
         Arguments:
-            node: node in tree to find child to traverse for
+        node (TreeNode): Node in tree to find child to traverse for
 
         Returns:
-            next node to traverse
+        TreeNode: child to traverse
         """
 
         if len(node.moves) == 0:
@@ -161,7 +180,7 @@ class Mcts:
             # calculate UCT, update if best
             mean_wins = child.wins / child.sims
             uct = mean_wins+(self.c*sqrt(log(self.root_node.sims)/child.sims))
-            if best_uct == None or uct > best_uct:
+            if best_uct is None or uct > best_uct:
                 best_uct = uct
                 best_child = child
 
@@ -169,15 +188,16 @@ class Mcts:
         return best_child
 
     def traverse(self, node: TreeNode):
-        """ function that traverses tree and finds node to simulate
+        """
+        Traverse tree and find node to simulate.
 
         Arguments:
-            node: root (first move) of tree
+        node (TreeNode): Root (first move) of tree
 
         Returns:
-            node: move to run simulation on
-            visited: list of nodes visited, needed for backprop
+        Node (TreeNode): move to run simulation on
         """
+
         while node.generated_children:
             node = self.best_uct(node)
 
@@ -186,4 +206,3 @@ class Mcts:
             node = random.choice(node.children)
 
         return node
-
