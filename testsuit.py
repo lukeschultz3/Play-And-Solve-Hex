@@ -1,11 +1,15 @@
+# Written by Luke Schultz
+# Winter 2023
+
 import hex_game0
 import hex_game1
 import hex_game1_1
+import hex_game2
 import mcts0
 
 from hex_game0 import ( BLACK )
 
-games = [hex_game0.Hex, hex_game1.Hex1, hex_game1_1.Hex1_1]
+games = [hex_game0.Hex, hex_game1.Hex1, hex_game1_1.Hex1_1, hex_game2.Hex2]
 
 def sim_count_test(average=5, size=8):
     averages = [0] * len(games)
@@ -45,6 +49,7 @@ def play(game_version1, game_version2, size, num_games):
                 won = game1.play_move(move)
                 game2.play_move(move)
                 print(str(game1))
+                print(str(game2))
 
                 if won and i % 2 == 0:
                     win_count[0] += 1
@@ -66,5 +71,5 @@ def play(game_version1, game_version2, size, num_games):
     print(win_count)
 
 
-#sim_count_test(1, 8)
-play(games[0], games[1], 8, 4)
+sim_count_test(5, 8)
+#play(games[0], games[1], 8, 6)
