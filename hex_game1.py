@@ -5,7 +5,7 @@
 # Board Representation:
 # 3 1 1 1 3    3 1 1 1 3
 # 2 0 0 0 2     2 0 0 0 2
-# 2 0 0 0 2 ->   2 0 0 0 2
+# 2 0 0 0 2 ==   2 0 0 0 2
 # 2 0 0 0 2       2 0 0 0 2
 # 3 1 1 1 3        3 1 1 1 3
 # Where BORDER = 3, BLACK = 1, WHITE = 2, BLANK = 0
