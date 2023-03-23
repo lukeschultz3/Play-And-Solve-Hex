@@ -2,6 +2,11 @@
 # Winter 2023
 #
 # 2d numpy array board representation.
+# Board Representation:
+# 0 0 0    0 0 0
+# 0 0 0 ==  0 0 0
+# 0 0 0      0 0 0
+# Where BLANK = 0
 
 import numpy as np
 from copy import deepcopy

@@ -3,9 +3,9 @@
 #
 # 2d list board representation.
 # Board Representation:
-# 0 0 0
-# 0 0 0
-# 0 0 0
+# 0 0 0    0 0 0
+# 0 0 0 ==  0 0 0
+# 0 0 0      0 0 0
 # Where BLANK = 0
 
 
