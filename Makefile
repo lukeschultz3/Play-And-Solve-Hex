@@ -3,3 +3,6 @@ cli:
 
 testsuit:
 	python3 testsuit.py
+
+clean:
+	rm -rf __pycache__
