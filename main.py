@@ -4,6 +4,7 @@ import hex_game1_1
 import hex_game2
 from hex_game0 import BLACK, WHITE, BLANK
 import mcts0
+import pns0
 
 import cProfile
 
@@ -94,6 +95,10 @@ def command_loop(game):
                     print("number of simulations performed:", mcts.root_node.sims)
                     game.play_move(move, WHITE)
                     print(str(game))
+            elif args[0] == "pns":
+                if args[1] == "x":
+                    pns = pns0.PNS(game, BLACK)
+                    pns.pns()
         except IndexError:
             continue
 
