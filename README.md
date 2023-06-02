@@ -1,5 +1,10 @@
 # MCTS-Hex
 
+## TODO
+Hex Knowledge Improvements: Bridges, Virtual Connection Engine, etc.
+Hex Implementation Improvements: Speedup get_legal_moves()
+MCTS Improvements: what's the best coefficient for UCT?
+
 The Makefile target
 `make runs`
 executes main.py which starts the CLI
