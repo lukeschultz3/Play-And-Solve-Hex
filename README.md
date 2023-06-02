@@ -1,11 +1,17 @@
 # MCTS-Hex
 
-## TODO
-Hex Knowledge Improvements: Bridges, Virtual Connection Engine, etc.
-Hex Implementation Improvements: Speedup get_legal_moves()
-MCTS Improvements: what's the best coefficient for UCT?
+## TODO (in no particular order, non-exhaustive)
+Hex Knowledge Improvements:
+1. Bridges
+2. General Virtual Connection Engine
 
-The Makefile target
+Hex Implementation Improvements:
+1. Speedup get_legal_moves()
+
+MCTS Improvements:
+1. what's the best coefficient for UCT?
+
+## Makefile
 `make runs`
 executes main.py which starts the CLI
 
