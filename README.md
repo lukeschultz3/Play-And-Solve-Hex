@@ -1,6 +1,8 @@
 # MCTS-Hex
 
 ## TODO (in no particular order, non-exhaustive)
+1. Random Hex Player
+
 Hex Knowledge Improvements:
 1. Bridges
 2. General Virtual Connection Engine
