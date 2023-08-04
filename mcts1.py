@@ -28,10 +28,35 @@ class TreeNode:
 
         for move in self.moves:
             game_copy = self.game.copy()
-            game_copy.play_move(move, self.player)
+            won = game_copy.play_move(move, self.player)
             self.children.append(
                 TreeNode(game_copy, 3-self.player, move, self)
             )
+
+            if won:
+                # backpropagate
+                node = self.children[-1]
+                result = float('inf')
+                while node is not None:
+                    #node.sims += 1
+
+                    if result == float('inf') and node != self.children[-1]:
+                        for children in node.children:
+                            if children.results != float('-inf'):
+                                result = 1
+                                break
+
+                    node.results += result
+
+                    #result *= -1
+                    if result == float('inf'):
+                        result = float('-inf')
+                    elif result == float('-inf'):
+                        result = float('inf')
+                    else:
+                        result = 1-result
+
+                    node = node.parent
 
         self.generated_children = True
 
@@ -52,9 +77,13 @@ class TreeNode:
             move_index = random.randint(0, len(moves)-1)  # Select random move
             won = game_copy.play_move(moves[move_index], player)
 
+            """
             if won and first_move:
                 return float('inf')
             elif won:
+                break
+            """
+            if won:
                 break
 
             first_move = False 
@@ -114,9 +143,19 @@ class Mcts:
         best_node = None
         most_visits = None
         for node in self.root_node.children:
+            if node.results == float('-inf'):
+                continue
+
             if most_visits is None or node.sims > most_visits:
                 best_node = node
                 most_visits = node.sims
+
+        if best_node is None: 
+            # all moves are losing, choose the one with the most visits
+            for node in self.root_node.children:
+                if most_visits is None or node.sims > most_visits:
+                    best_node = node
+                    most_visits = node.sims
 
         return best_node.move
 
@@ -144,18 +183,28 @@ class Mcts:
             while node is not None:
                 node.sims += 1
 
-                if result == -float('inf'):
+                if result == float('inf') and node != leaf:
                     for children in node.children:
-                        if children.results != -float('inf'):
-                            result = -1
+                        if children.results != float('-inf'):
+                            result = 1
                             break
+                elif result == float('inf') and node.parent is None:
+                    return node.move
 
                 node.results += result
 
-                result *= -1
+                #result *= -1
+                if result == float('inf'):
+                    result = float('-inf')
+                elif result == float('-inf'):
+                    result = float('inf')
+                else:
+                    result = 1-result
 
                 node = node.parent
 
+        for child in self.root_node.children:
+            print(child.move, child.sims, child.results)
         return self.get_best_move()
 
     def best_uct(self, node: TreeNode) -> TreeNode:
