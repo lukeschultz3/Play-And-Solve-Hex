@@ -97,7 +97,7 @@ class Mcts:
         self.root_node = RootNode(game, player)
         self.winning_move = self.root_node.generate_children()
 
-        self.c = 0.4  # used for UCT
+        self.c = 0.3  # used for UCT
 
     def get_best_move(self):
         """
