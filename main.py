@@ -4,6 +4,7 @@ import hex_game1_1
 import hex_game2
 from hex_game0 import BLACK, WHITE, BLANK
 import mcts0
+import mcts1
 import pns0
 
 import cProfile
