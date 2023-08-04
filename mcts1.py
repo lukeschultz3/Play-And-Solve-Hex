@@ -53,7 +53,7 @@ class TreeNode:
             won = game_copy.play_move(moves[move_index], player)
 
             if won and first_move:
-                return float.inf
+                return float('inf')
             elif won:
                 break
 
@@ -144,13 +144,13 @@ class Mcts:
             while node is not None:
                 node.sims += 1
 
-                if result == -float.inf:
+                if result == -float('inf'):
                     for children in node.children:
-                        if children.results != -float.inf:
+                        if children.results != -float('inf'):
                             result = -1
                             break
 
-                node.result += result
+                node.results += result
 
                 result *= -1
 
