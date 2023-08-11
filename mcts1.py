@@ -38,8 +38,6 @@ class TreeNode:
                 node = self.children[-1]
                 result = float('inf')
                 while node is not None:
-                    #node.sims += 1
-
                     if result == float('inf') and node != self.children[-1]:
                         for children in node.children:
                             if children.results != float('-inf'):
@@ -48,7 +46,6 @@ class TreeNode:
 
                     node.results += result
 
-                    #result *= -1
                     if result == float('inf'):
                         result = float('-inf')
                     elif result == float('-inf'):
@@ -72,21 +69,13 @@ class TreeNode:
         game_copy = self.game.copy()
         player = self.player  # player to move
         moves = game_copy.get_legal_moves()
-        first_move = True
         while len(moves) > 0:
             move_index = random.randint(0, len(moves)-1)  # Select random move
             won = game_copy.play_move(moves[move_index], player)
 
-            """
-            if won and first_move:
-                return float('inf')
-            elif won:
-                break
-            """
             if won:
                 break
 
-            first_move = False 
             moves[move_index] = moves[-1]
             moves.pop()
             player = 3 - player  # invert color / switch player
