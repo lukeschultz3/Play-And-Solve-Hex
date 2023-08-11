@@ -6,8 +6,12 @@ from hex_game0 import BLACK, WHITE, BLANK
 import mcts0
 import mcts1
 import pns0
-
 import cProfile
+
+# TO DO:
+# • Check potential virtual connections in random order
+# • You can only be VCs with 1 other stone. 2 VCs involving the same stone is redundant.
+# • Change the simulations code to acknowledge when the opponent has moved inside of an existing virtual connection.
 
 size = 8
 previous_game = None
