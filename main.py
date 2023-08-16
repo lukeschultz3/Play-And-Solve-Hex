@@ -5,6 +5,7 @@ import hex_game2
 from hex_game0 import BLACK, WHITE, BLANK
 import mcts0
 import mcts1
+import mcts2
 import pns0
 
 import cProfile
@@ -82,18 +83,24 @@ def command_loop(game):
             elif args[0] == "mcts":
                 if args[1] == "x":
                     previous_game = game.copy()
-                    mcts = mcts1.Mcts(game, BLACK)
-                    move = mcts.monte_carlo_tree_search()
+                    #mcts = mcts1.Mcts(game, BLACK)
+                    #move = mcts.monte_carlo_tree_search()
+                    mcts = mcts2.MCTS()
+                    move = mcts.mcts(game)
                     #cProfile.runctx('mcts.monte_carlo_tree_search()', globals(), locals())
                     #exit()
-                    print("number of simulations performed:", mcts.root_node.sims)
+                    #print("number of simulations performed:", mcts.root_node.sims)
                     game.play_move(move, BLACK)
                     print(str(game))
                 elif args[1] == "o":
                     previous_game = game.copy()
+                    """
                     mcts = mcts1.Mcts(game, WHITE)
                     move = mcts.monte_carlo_tree_search()
-                    print("number of simulations performed:", mcts.root_node.sims)
+                    """
+                    mcts = mcts2.MCTS()
+                    move = mcts.mcts(game)
+                    #print("number of simulations performed:", mcts.root_node.sims)
                     game.play_move(move, WHITE)
                     print(str(game))
             elif args[0] == "pns":
