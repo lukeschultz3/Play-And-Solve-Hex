@@ -13,7 +13,7 @@ import cProfile
 # • You can only be VCs with 1 other stone. 2 VCs involving the same stone is redundant.
 # • Change the simulations code to acknowledge when the opponent has moved inside of an existing virtual connection.
 
-size = 8
+size = 7
 previous_game = None
 version = "2"  # "0" or "1" or "1.1" or "2"
 
@@ -28,6 +28,58 @@ def coord_to_move(coord: str) -> list:
         return [row, col]
     except:
         print("invalid coordinate")
+
+
+def compute_black_vc(stone: str):
+        """compute simple virutal connections for a black stone on the board"""
+        move = coord_to_move(stone)
+        row = move[0]
+        col = move[1]
+        vcs = []
+
+        # Check if the stone is in the top right corner of the board.
+        # If it is, that means it only has a bridge connection to the lower right cell.
+        if col == 0:
+            lower_right_vc = [row + 1, col]
+            vcs.append(lower_right_vc)
+        
+        # Check if the stone is in the bottom right corner of the board. 
+        # If it is, that means it only has a bridge connection to the upper left cell.
+        elif col == (size - 1):
+            upper_left_vc = [row - 1, col]
+            vcs.append(upper_left_vc)
+        
+        # Check if the stone is in the first row of the board, but not the first left corner.
+        # If it is, that means it only has a bridge connection to the lower left/right cells.
+        elif row == 0 and row != col:
+            lower_left_vc = [row + 1, col - 1]
+            lower_right_vc = [row + 1, col]
+            vcs.append(lower_left_vc)
+            vcs.append(lower_right_vc)
+
+        # Check if the stone is in the last row of the board, but not the last right corner.
+        # If it is, that means it only has a bridge connection to the upper left/right cells.
+        elif row == (size - 1) and row != col:
+            upper_left_vc = [row - 1, col]
+            upper_right_vc = [row - 1, col +1]
+            vcs.append(upper_left_vc)
+            vcs.append(upper_right_vc)
+
+        # The stone is not in the top left corner, bottom right corner, top row, or bottom row.
+        # This means it has a bridge connection to all combinations of upper/lower/left/right cells.
+        else:
+            upper_left_vc = [row - 1, col]
+            upper_right_vc = [row - 1, col +1]
+            lower_left_vc = [row + 1, col - 1]
+            lower_right_vc = [row + 1, col]
+            vcs.append(upper_left_vc)
+            vcs.append(upper_right_vc)
+            vcs.append(lower_left_vc)
+            vcs.append(lower_right_vc)
+
+        # Return the final list of virtual connections.
+        return vcs
+
 
 def command_loop(game):
     command = None
@@ -44,6 +96,9 @@ def command_loop(game):
                 previous_game = game.copy()
                 move = coord_to_move(args[1])
                 game.play_move(move, BLACK)
+                print(str(game))
+            elif args[0] == "vc":
+                move = compute_black_vc(args[1])
                 print(str(game))
             elif args[0] == "o":
                 previous_game = game.copy()

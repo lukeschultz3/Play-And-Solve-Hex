@@ -24,7 +24,6 @@ class Hex2(Hex1):
         self.board_dim = self.game_dim + 2
         self.board_size = self.board_dim ** 2
         self.board = np.array([BLANK] * self.board_size)
-
         self.current_player = BLACK
         self.union_find = None
 
@@ -125,3 +124,4 @@ class Hex2(Hex1):
         game_copy.union_find = deepcopy(self.union_find)
 
         return game_copy
+    
