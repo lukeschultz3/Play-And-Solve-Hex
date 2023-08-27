@@ -61,7 +61,7 @@ def compute_black_vc(stone: str):
         # If it is, that means it only has a bridge connection to the upper left/right cells.
         elif row == (size - 1) and row != col:
             upper_left_vc = [row - 1, col]
-            upper_right_vc = [row - 1, col +1]
+            upper_right_vc = [row - 1, col + 1]
             vcs.append(upper_left_vc)
             vcs.append(upper_right_vc)
         
@@ -69,7 +69,7 @@ def compute_black_vc(stone: str):
         # If it is, it will be missing a lower left bridge connection.
         elif col == 0 and row != col and row != (size - 1):
             upper_left_vc = [row - 1, col]
-            upper_right_vc = [row - 1, col +1]
+            upper_right_vc = [row - 1, col + 1]
             lower_right_vc = [row + 1, col]
             vcs.append(upper_left_vc)
             vcs.append(upper_right_vc)
@@ -89,7 +89,7 @@ def compute_black_vc(stone: str):
         # This means it has a bridge connection to all combinations of upper/lower/left/right cells.
         else:
             upper_left_vc = [row - 1, col]
-            upper_right_vc = [row - 1, col +1]
+            upper_right_vc = [row - 1, col + 1]
             lower_left_vc = [row + 1, col - 1]
             lower_right_vc = [row + 1, col]
             vcs.append(upper_left_vc)
