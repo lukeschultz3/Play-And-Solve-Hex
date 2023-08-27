@@ -37,15 +37,15 @@ def compute_black_vc(stone: str):
         col = move[1]
         vcs = []
 
-        # Check if the stone is in the top right corner of the board.
+        # Check if the stone is in the top left corner of the board.
         # If it is, that means it only has a bridge connection to the lower right cell.
-        if col == 0:
+        if col == 0 and row == 0:
             lower_right_vc = [row + 1, col]
             vcs.append(lower_right_vc)
         
         # Check if the stone is in the bottom right corner of the board. 
         # If it is, that means it only has a bridge connection to the upper left cell.
-        elif col == (size - 1):
+        elif col == (size - 1) and row == (size - 1):
             upper_left_vc = [row - 1, col]
             vcs.append(upper_left_vc)
         
@@ -64,8 +64,28 @@ def compute_black_vc(stone: str):
             upper_right_vc = [row - 1, col +1]
             vcs.append(upper_left_vc)
             vcs.append(upper_right_vc)
+        
+        # Check if the stone is in the leftmost edge of the board but not the top/bottom left corner.
+        # If it is, it will be missing a lower left bridge connection.
+        elif col == 0 and row != col and row != (size - 1):
+            upper_left_vc = [row - 1, col]
+            upper_right_vc = [row - 1, col +1]
+            lower_right_vc = [row + 1, col]
+            vcs.append(upper_left_vc)
+            vcs.append(upper_right_vc)
+            vcs.append(lower_right_vc)
+        
+        # Check if the stone is in the rightmost edge of the board but not the top/bottom right corner.
+        # If it is, it will be missing an upper right bridge connection.
+        elif col == (size - 1) and row != 0 and row != col:
+            upper_left_vc = [row - 1, col]
+            lower_left_vc = [row + 1, col - 1]
+            lower_right_vc = [row + 1, col]
+            vcs.append(upper_left_vc)
+            vcs.append(lower_left_vc)
+            vcs.append(lower_right_vc)
 
-        # The stone is not in the top left corner, bottom right corner, top row, or bottom row.
+        # The stone is not in the edges of the board.
         # This means it has a bridge connection to all combinations of upper/lower/left/right cells.
         else:
             upper_left_vc = [row - 1, col]
@@ -96,9 +116,6 @@ def command_loop(game):
                 previous_game = game.copy()
                 move = coord_to_move(args[1])
                 game.play_move(move, BLACK)
-                print(str(game))
-            elif args[0] == "vc":
-                move = compute_black_vc(args[1])
                 print(str(game))
             elif args[0] == "o":
                 previous_game = game.copy()
@@ -159,6 +176,10 @@ def command_loop(game):
                 if args[1] == "x":
                     pns = pns0.PNS(game, BLACK)
                     pns.pns()
+            elif args[0] == "bvc":
+                bvcs = compute_black_vc(args[1])
+                print(str(game))
+                print("The black stone at", coord_to_move(args[1]), "is virtually connected to:", bvcs)
         except IndexError:
             continue
 
