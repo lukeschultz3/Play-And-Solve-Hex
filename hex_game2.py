@@ -144,31 +144,61 @@ class Hex2(Hex1):
             upper_left_vc = [row - 1, col]
             vcs.append(upper_left_vc)
         
-        # Check if the stone is in the first row of the board, but not the first left corner.
+        # Check if the stone is in the first row of the board, but not the first left/right corners.
         # If it is, that means it only has a bridge connection to the lower left/right cells.
-        elif row == 0 and row != col:
+        elif row == 0 and row != col and col != (self.board_dim - 3):
             lower_left_vc = [row + 1, col - 1]
             lower_right_vc = [row + 1, col]
+            left_vc = [row, col - 1]
+            right_vc = [row, col + 1]
             vcs.append(lower_left_vc)
             vcs.append(lower_right_vc)
-
-        # Check if the stone is in the last row of the board, but not the last right corner.
-        # If it is, that means it only has a bridge connection to the upper left/right cells.
-        elif row == (self.board_dim - 3) and row != col:
+            vcs.append(left_vc)
+            vcs.append(right_vc)
+        
+        # Check if the stone is in the top right corner of the board.
+        # If it is, that means it only has a bridge connection to the left, lower left, and lower right cells.
+        elif row == 0 and col == (self.board_dim - 3):
+            lower_left_vc = [row + 1, col - 1]
+            lower_right_vc = [row + 1, col]
+            left_vc = [row, col - 1]
+            vcs.append(lower_left_vc)
+            vcs.append(lower_right_vc)
+            vcs.append(left_vc)
+        
+        # Check if the stone is in the bottom left corner of the board.
+        #If it is, that means it only has a bridge connection to the right, upper left, and upper right cells.
+        elif row == (self.board_dim - 3) and col == 0:
             upper_left_vc = [row - 1, col]
             upper_right_vc = [row - 1, col + 1]
+            right_vc = [row, col + 1]
             vcs.append(upper_left_vc)
             vcs.append(upper_right_vc)
+            vcs.append(right_vc)
+
+        # Check if the stone is in the bottom row of the board, but not the bottom left/right corners.
+        # If it is, that means it only has a bridge connection to the upper left/right cells.
+        elif row == (self.board_dim - 3) and row != col and col != (self.board_dim - 3):
+            upper_left_vc = [row - 1, col]
+            upper_right_vc = [row - 1, col + 1]
+            left_vc = [row, col - 1]
+            right_vc = [row, col + 1]
+            vcs.append(upper_left_vc)
+            vcs.append(upper_right_vc)
+            vcs.append(left_vc)
+            vcs.append(right_vc)
         
         # Check if the stone is in the leftmost edge of the board but not the top/bottom left corner.
-        # If it is, it will be missing a lower left bridge connection.
+        # If it is, it will be missing a left and lower left bridge connection.
         elif col == 0 and row != col and row != (self.board_dim - 3):
             upper_left_vc = [row - 1, col]
             upper_right_vc = [row - 1, col + 1]
             lower_right_vc = [row + 1, col]
+            right_vc = [row, col + 1]
             vcs.append(upper_left_vc)
             vcs.append(upper_right_vc)
             vcs.append(lower_right_vc)
+            vcs.append(right_vc)
         
         # Check if the stone is in the rightmost edge of the board but not the top/bottom right corner.
         # If it is, it will be missing an upper right bridge connection.
@@ -176,9 +206,11 @@ class Hex2(Hex1):
             upper_left_vc = [row - 1, col]
             lower_left_vc = [row + 1, col - 1]
             lower_right_vc = [row + 1, col]
+            left_vc = [row, col - 1]
             vcs.append(upper_left_vc)
             vcs.append(lower_left_vc)
             vcs.append(lower_right_vc)
+            vcs.append(left_vc)
 
         # The stone is not in the edges of the board.
         # This means it has a bridge connection to all combinations of upper/lower/left/right cells.
@@ -187,10 +219,14 @@ class Hex2(Hex1):
             upper_right_vc = [row - 1, col + 1]
             lower_left_vc = [row + 1, col - 1]
             lower_right_vc = [row + 1, col]
+            left_vc = [row, col - 1]
+            right_vc = [row, col + 1]
             vcs.append(upper_left_vc)
             vcs.append(upper_right_vc)
             vcs.append(lower_left_vc)
             vcs.append(lower_right_vc)
+            vcs.append(left_vc)
+            vcs.append(right_vc)
 
         # Return the final list of virtual connections.
         return vcs

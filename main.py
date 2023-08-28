@@ -16,6 +16,7 @@ import cProfile
 size = 7
 previous_game = None
 version = "2"  # "0" or "1" or "1.1" or "2"
+existing_vcs = []
 
 def coord_to_move(coord: str) -> list:
     """convert coord in the form a1 to list index"""
