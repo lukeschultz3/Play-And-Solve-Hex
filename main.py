@@ -30,75 +30,75 @@ def coord_to_move(coord: str) -> list:
         print("invalid coordinate")
 
 
-def compute_black_vc(stone: str):
-        """compute simple virutal connections for a black stone on the board"""
-        move = coord_to_move(stone)
-        row = move[0]
-        col = move[1]
-        vcs = []
+# def compute_black_vc(stone: list):
+#         """compute simple virutal connections for a black stone on the board"""
+#         move = coord_to_move(stone)
+#         row = move[0]
+#         col = move[1]
+#         vcs = []
 
-        # Check if the stone is in the top left corner of the board.
-        # If it is, that means it only has a bridge connection to the lower right cell.
-        if col == 0 and row == 0:
-            lower_right_vc = [row + 1, col]
-            vcs.append(lower_right_vc)
+#         # Check if the stone is in the top left corner of the board.
+#         # If it is, that means it only has a bridge connection to the lower right cell.
+#         if col == 0 and row == 0:
+#             lower_right_vc = [row + 1, col]
+#             vcs.append(lower_right_vc)
         
-        # Check if the stone is in the bottom right corner of the board. 
-        # If it is, that means it only has a bridge connection to the upper left cell.
-        elif col == (size - 1) and row == (size - 1):
-            upper_left_vc = [row - 1, col]
-            vcs.append(upper_left_vc)
+#         # Check if the stone is in the bottom right corner of the board. 
+#         # If it is, that means it only has a bridge connection to the upper left cell.
+#         elif col == (size - 1) and row == (size - 1):
+#             upper_left_vc = [row - 1, col]
+#             vcs.append(upper_left_vc)
         
-        # Check if the stone is in the first row of the board, but not the first left corner.
-        # If it is, that means it only has a bridge connection to the lower left/right cells.
-        elif row == 0 and row != col:
-            lower_left_vc = [row + 1, col - 1]
-            lower_right_vc = [row + 1, col]
-            vcs.append(lower_left_vc)
-            vcs.append(lower_right_vc)
+#         # Check if the stone is in the first row of the board, but not the first left corner.
+#         # If it is, that means it only has a bridge connection to the lower left/right cells.
+#         elif row == 0 and row != col:
+#             lower_left_vc = [row + 1, col - 1]
+#             lower_right_vc = [row + 1, col]
+#             vcs.append(lower_left_vc)
+#             vcs.append(lower_right_vc)
 
-        # Check if the stone is in the last row of the board, but not the last right corner.
-        # If it is, that means it only has a bridge connection to the upper left/right cells.
-        elif row == (size - 1) and row != col:
-            upper_left_vc = [row - 1, col]
-            upper_right_vc = [row - 1, col + 1]
-            vcs.append(upper_left_vc)
-            vcs.append(upper_right_vc)
+#         # Check if the stone is in the last row of the board, but not the last right corner.
+#         # If it is, that means it only has a bridge connection to the upper left/right cells.
+#         elif row == (size - 1) and row != col:
+#             upper_left_vc = [row - 1, col]
+#             upper_right_vc = [row - 1, col + 1]
+#             vcs.append(upper_left_vc)
+#             vcs.append(upper_right_vc)
         
-        # Check if the stone is in the leftmost edge of the board but not the top/bottom left corner.
-        # If it is, it will be missing a lower left bridge connection.
-        elif col == 0 and row != col and row != (size - 1):
-            upper_left_vc = [row - 1, col]
-            upper_right_vc = [row - 1, col + 1]
-            lower_right_vc = [row + 1, col]
-            vcs.append(upper_left_vc)
-            vcs.append(upper_right_vc)
-            vcs.append(lower_right_vc)
+#         # Check if the stone is in the leftmost edge of the board but not the top/bottom left corner.
+#         # If it is, it will be missing a lower left bridge connection.
+#         elif col == 0 and row != col and row != (size - 1):
+#             upper_left_vc = [row - 1, col]
+#             upper_right_vc = [row - 1, col + 1]
+#             lower_right_vc = [row + 1, col]
+#             vcs.append(upper_left_vc)
+#             vcs.append(upper_right_vc)
+#             vcs.append(lower_right_vc)
         
-        # Check if the stone is in the rightmost edge of the board but not the top/bottom right corner.
-        # If it is, it will be missing an upper right bridge connection.
-        elif col == (size - 1) and row != 0 and row != col:
-            upper_left_vc = [row - 1, col]
-            lower_left_vc = [row + 1, col - 1]
-            lower_right_vc = [row + 1, col]
-            vcs.append(upper_left_vc)
-            vcs.append(lower_left_vc)
-            vcs.append(lower_right_vc)
+#         # Check if the stone is in the rightmost edge of the board but not the top/bottom right corner.
+#         # If it is, it will be missing an upper right bridge connection.
+#         elif col == (size - 1) and row != 0 and row != col:
+#             upper_left_vc = [row - 1, col]
+#             lower_left_vc = [row + 1, col - 1]
+#             lower_right_vc = [row + 1, col]
+#             vcs.append(upper_left_vc)
+#             vcs.append(lower_left_vc)
+#             vcs.append(lower_right_vc)
 
-        # The stone is not in the edges of the board.
-        # This means it has a bridge connection to all combinations of upper/lower/left/right cells.
-        else:
-            upper_left_vc = [row - 1, col]
-            upper_right_vc = [row - 1, col + 1]
-            lower_left_vc = [row + 1, col - 1]
-            lower_right_vc = [row + 1, col]
-            vcs.append(upper_left_vc)
-            vcs.append(upper_right_vc)
-            vcs.append(lower_left_vc)
-            vcs.append(lower_right_vc)
+#         # The stone is not in the edges of the board.
+#         # This means it has a bridge connection to all combinations of upper/lower/left/right cells.
+#         else:
+#             upper_left_vc = [row - 1, col]
+#             upper_right_vc = [row - 1, col + 1]
+#             lower_left_vc = [row + 1, col - 1]
+#             lower_right_vc = [row + 1, col]
+#             vcs.append(upper_left_vc)
+#             vcs.append(upper_right_vc)
+#             vcs.append(lower_left_vc)
+#             vcs.append(lower_right_vc)
 
-        # Return the final list of virtual connections.
-        return vcs
+#         # Return the final list of virtual connections.
+#         return vcs
 
 
 def command_loop(game):
@@ -177,9 +177,9 @@ def command_loop(game):
                     pns = pns0.PNS(game, BLACK)
                     pns.pns()
             elif args[0] == "bvc":
-                bvcs = compute_black_vc(args[1])
+                mutual_vc = game.check_black_vcs(coord_to_move(args[1]), coord_to_move(args[2]))
                 print(str(game))
-                print("The black stone at", coord_to_move(args[1]), "is virtually connected to:", bvcs)
+                print("The mutual VCs between", args[1], "and", args[2], "is:", mutual_vc)
         except IndexError:
             continue
 

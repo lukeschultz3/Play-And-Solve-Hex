@@ -125,3 +125,94 @@ class Hex2(Hex1):
 
         return game_copy
     
+    def compute_black_vc(self, stone: list):
+        """Compute simple virutal connections for a black stone on the board"""
+        
+        row = stone[0]
+        col = stone[1]
+        vcs = []
+
+        # Check if the stone is in the top left corner of the board.
+        # If it is, that means it only has a bridge connection to the lower right cell.
+        if col == 0 and row == 0:
+            lower_right_vc = [row + 1, col]
+            vcs.append(lower_right_vc)
+        
+        # Check if the stone is in the bottom right corner of the board. 
+        # If it is, that means it only has a bridge connection to the upper left cell.
+        elif col == (self.board_dim - 3) and row == (self.board_dim - 3):
+            upper_left_vc = [row - 1, col]
+            vcs.append(upper_left_vc)
+        
+        # Check if the stone is in the first row of the board, but not the first left corner.
+        # If it is, that means it only has a bridge connection to the lower left/right cells.
+        elif row == 0 and row != col:
+            lower_left_vc = [row + 1, col - 1]
+            lower_right_vc = [row + 1, col]
+            vcs.append(lower_left_vc)
+            vcs.append(lower_right_vc)
+
+        # Check if the stone is in the last row of the board, but not the last right corner.
+        # If it is, that means it only has a bridge connection to the upper left/right cells.
+        elif row == (self.board_dim - 3) and row != col:
+            upper_left_vc = [row - 1, col]
+            upper_right_vc = [row - 1, col + 1]
+            vcs.append(upper_left_vc)
+            vcs.append(upper_right_vc)
+        
+        # Check if the stone is in the leftmost edge of the board but not the top/bottom left corner.
+        # If it is, it will be missing a lower left bridge connection.
+        elif col == 0 and row != col and row != (self.board_dim - 3):
+            upper_left_vc = [row - 1, col]
+            upper_right_vc = [row - 1, col + 1]
+            lower_right_vc = [row + 1, col]
+            vcs.append(upper_left_vc)
+            vcs.append(upper_right_vc)
+            vcs.append(lower_right_vc)
+        
+        # Check if the stone is in the rightmost edge of the board but not the top/bottom right corner.
+        # If it is, it will be missing an upper right bridge connection.
+        elif col == (self.board_dim - 3) and row != 0 and row != col:
+            upper_left_vc = [row - 1, col]
+            lower_left_vc = [row + 1, col - 1]
+            lower_right_vc = [row + 1, col]
+            vcs.append(upper_left_vc)
+            vcs.append(lower_left_vc)
+            vcs.append(lower_right_vc)
+
+        # The stone is not in the edges of the board.
+        # This means it has a bridge connection to all combinations of upper/lower/left/right cells.
+        else:
+            upper_left_vc = [row - 1, col]
+            upper_right_vc = [row - 1, col + 1]
+            lower_left_vc = [row + 1, col - 1]
+            lower_right_vc = [row + 1, col]
+            vcs.append(upper_left_vc)
+            vcs.append(upper_right_vc)
+            vcs.append(lower_left_vc)
+            vcs.append(lower_right_vc)
+
+        # Return the final list of virtual connections.
+        return vcs
+    
+    def check_black_vcs(self, stone_1: list, stone_2: list):
+        """Check if two stones on the board share a simple bridge connection.
+        This is also known as a Hex virtual connection."""
+
+        # The compute_black_vc function will return a 2D list.
+        # 2D lists in python aren't hashable so I need to turn these into a hashmap of tuples first.
+        stone_1_vcs = map(tuple, self.compute_black_vc(stone_1))
+        stone_2_vcs = map(tuple, self.compute_black_vc(stone_2))
+
+        # We turn the hashmaps into sets and then calculate the intersection.
+        # This finds if stone_1 has common neighbours with stone_2.
+        common_vcs = set(stone_1_vcs).intersection(set(stone_2_vcs))
+
+        # If there is more than 1 common neighbour, that means a bridge connection exists. 
+        if len(common_vcs) > 1:
+            return common_vcs
+        
+        # If there is only 1 common neighbour, there is no simple bridge.
+        else:
+            return {}
+    
