@@ -127,7 +127,7 @@ class Hex2(Hex1):
     
     def compute_black_vc(self, stone: list):
         """Compute simple virutal connections for a black stone on the board"""
-        
+
         row = stone[0]
         col = stone[1]
         vcs = []
@@ -212,7 +212,7 @@ class Hex2(Hex1):
         if len(common_vcs) > 1:
             return common_vcs
         
-        # If there is only 1 common neighbour, there is no simple bridge.
+        # If there is 0 or only 1 common neighbour, there is no simple bridge.
         else:
             return {}
     
