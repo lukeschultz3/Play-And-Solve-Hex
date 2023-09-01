@@ -15,7 +15,7 @@ from copy import deepcopy
 import numpy as np
 
 
-# board constant
+# Board constants
 BLANK = 0
 BLACK = 1
 WHITE = 2
@@ -55,17 +55,24 @@ class Hex1:
         """Returns string representation of board."""
 
         char_reprs = {BLACK: "x", WHITE: "o", BORDER: "~", BLANK: "."}
-        string = "  "
+        string = "   "
+        for i in range(0, self.game_dim):
+            string += "x "
+        string += "\n"
+        string += "    "
         for i in range(0, self.game_dim):
             string += chr(i+97) + " "
         string += "\n"
         for i in range(1, self.board_dim-1):
             string += " " * i
-            string += str(i) + " "
+            string += "o" + " " + str(i) + " "
 
             for j in range(1, self.board_dim-1):
                 string += char_reprs[self.board[(i*self.board_dim)+j]] + " "
-            string += "\n"
+            string += "o\n"
+        string += " " * (self.board_dim + 3)
+        for i in range(0, self.game_dim):
+            string += "x "
 
         return string
 
@@ -190,3 +197,8 @@ class Hex1:
         game_copy.current_player = self.current_player
 
         return game_copy
+
+
+if __name__ == "__main__":
+    game = Hex1(8)
+    print(game)
