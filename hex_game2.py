@@ -89,9 +89,9 @@ class Hex2(Hex1):
             if self.board[neighbour_move] == player:
                 self.union_find.union(neighbour_move, move)
 
-        return self._check_win()
+        return self.check_win()
 
-    def _check_win(self) -> bool:
+    def check_win(self) -> bool:
         """
         Check if the game has been won.
 

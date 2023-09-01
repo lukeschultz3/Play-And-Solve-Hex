@@ -48,7 +48,7 @@ class Hex1:
                        self.board_dim*(self.board_dim-1),
                        self.board_dim):  # Right side
             self.board[i] = WHITE
-
+        
         self.current_player = BLACK
 
     def __str__(self) -> str:
@@ -76,14 +76,9 @@ class Hex1:
 
         return string
 
-    def _2d_to_1d(self, index: list) -> int:
-        """Converts 2d position to 1d position."""
-        return (index[0]+1) * self.board_dim + index[1]+1
-
     def get_legal_moves(self) -> list:
         """Returns list of legal moves."""
 
-        # TODO optimize
         legal_moves = []
         for i in range(len(self.board)):
             if self.board[i] == BLANK:
@@ -102,6 +97,8 @@ class Hex1:
         bool: True if game has been won
         """
 
+        assert(self.board[move] == BLANK)
+
         if type(move) is list:
             move = self._2d_to_1d(move)
 
@@ -111,7 +108,7 @@ class Hex1:
         self.board[move] = player
         self.current_player = 3 - self.current_player  # Switch player
 
-        return self._check_win(move)
+        return self.check_win(move)
 
     def clear_move(self, pos: int):
         """Set a tile at pos to BLANK."""
@@ -131,7 +128,7 @@ class Hex1:
                 move+(self.board_dim-1),
                 move+(self.board_dim)]
 
-    def _check_win(self, move: int) -> bool:
+    def check_win(self, move: int) -> bool:
         """
         Check if the game has been won.
 
