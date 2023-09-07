@@ -1,111 +1,129 @@
 # Created by Luke Schultz
-# Fall 2022 / Winter 2023
+# Winter 2023
 #
-# 2d list board representation.
+# 1d list board representation.
 # Board Representation:
-# 0 0 0    0 0 0
-# 0 0 0 ==  0 0 0
-# 0 0 0      0 0 0
-# Where BLANK = 0
+# 3 1 1 1 3    3 1 1 1 3
+# 2 0 0 0 2     2 0 0 0 2
+# 2 0 0 0 2 ==   2 0 0 0 2
+# 2 0 0 0 2       2 0 0 0 2
+# 3 1 1 1 3        3 1 1 1 3
+# Where BORDER = 3, BLACK = 1, WHITE = 2, BLANK = 0
 
 
 from copy import deepcopy
 
 
-# board constants
+# Board constants
 BLANK = 0
 BLACK = 1
 WHITE = 2
 BORDER = 3
 
 
-class Hex:
-    def __init__(self, size: int):
-        self.size = size
-        self.board = [[BLANK for i in range(size)] for j in range(size)]
+class Hex0:
+    def __init__(self, game_dim: int):
+        self.game_dim = game_dim  # Side length of the game
+        self.board_dim = self.game_dim + 2  # Side length of the array repr
+        self.board_size = self.board_dim ** 2
+        self.board = [BLANK] * self.board_size
+
+        # Set corners to be borders
+        self.board[0] = BORDER
+        self.board[self.board_dim-1] = BORDER
+        self.board[-self.board_dim] = BORDER
+        self.board[-1] = BORDER
+
+        # Set BLACK sides to contain BLACK pieces
+        for i in range(1, self.board_dim-1): # Left/top
+            self.board[i] = BLACK
+        for i in range(self.board_size-self.game_dim-1, self.board_size-1):
+            self.board[i] = BLACK  # Right/bottom
+
+        # Set WHITE sides to contain WHITE pieces
+        for i in range(self.board_dim,
+                       self.board_dim*(self.board_dim-1),
+                       self.board_dim):  # Left side
+            self.board[i] = WHITE
+        for i in range((self.board_dim*2)-1,
+                       self.board_dim*(self.board_dim-1),
+                       self.board_dim):  # Right side
+            self.board[i] = WHITE
+        
         self.current_player = BLACK
 
     def __str__(self) -> str:
         """Returns string representation of board."""
 
-        string = " "
-
-        for i in range(self.size):
-            if i < 8:
-                string += chr(97+i) + " "
-            else:
-                string += chr(97+i+1) + " "
+        char_reprs = {BLACK: "x", WHITE: "o", BORDER: "~", BLANK: "."}
+        string = "   "
+        for i in range(0, self.game_dim):
+            string += "x "
         string += "\n"
+        string += "    "
+        for i in range(0, self.game_dim):
+            string += chr(i+97) + " "
+        string += "\n"
+        for i in range(1, self.board_dim-1):
+            string += " " * i
+            string += "o" + " " + str(i) + " "
 
-        for i in range(self.size):
-            if i < 9:  # Single digit coord
-                string += " " * (i) + str(i+1) + " "
-            else:  # Double digit coord
-                string += " " * (i-1) + str(i+1) + " "
-
-            for j in range(self.size):
-                if self.board[i][j] == BLACK:
-                    string += "x "
-                elif self.board[i][j] == WHITE:
-                    string += "o "
-                elif self.board[i][j] == BLANK:
-                    string += ". "
-                else:
-                    string += str(self.board[i][j]) + " "
-            string += "\n"
+            for j in range(1, self.board_dim-1):
+                string += char_reprs[self.board[(i*self.board_dim)+j]] + " "
+            string += "o\n"
+        string += " " * (self.board_dim + 3)
+        for i in range(0, self.game_dim):
+            string += "x "
 
         return string
 
     def get_legal_moves(self) -> list:
         """Returns list of legal moves."""
 
-        # TODO optimize
         legal_moves = []
         for i in range(len(self.board)):
-            for j in range(len(self.board[i])):
-                if self.board[i][j] == BLANK:
-                    legal_moves.append([i, j])
+            if self.board[i] == BLANK:
+                legal_moves.append(i)
         return legal_moves
 
-    def play_move(self, move: list, player: int = None) -> bool:
+    def play_move(self, move: int, player: int = None) -> bool:
         """
         Play a move, update the current player, check for win.
 
         Parameters:
-        move(list): Position of move
+        move (int): Position of move
         player (int): WHITE or BLACK, player to move
 
         Returns:
         bool: True if game has been won
         """
 
-        if type(move) is int:  # Convert 1d move to 2d
-            move = [move // (self.size+1), move % (self.size+1)]
+        assert(self.board[move] == BLANK)
 
         if player is None:
             player = self.current_player
 
-        self.board[move[0]][move[1]] = player
+        self.board[move] = player
         self.current_player = 3 - self.current_player  # Switch player
 
-        return self._check_win(move)
+        return self.check_win(move)
 
-    def clear_move(self, move: list):
-        """Set a tile to BLANK."""
+    def clear_move(self, pos: int):
+        """Set a tile at pos to BLANK."""
 
-        self.board[move[0]][move[1]] = BLANK
+        self.board[pos] = BLANK
 
-    def _get_neighbours(self, move: list) -> list:
-        """Returns a list of neighbouring tiles."""
+    def _get_neighbours(self, move: int) -> list:
+        """Returns a list of neighbours for a given move."""
 
-        return [[move[0],   move[1]-1],
-                [move[0]+1, move[1]-1],
-                [move[0]-1, move[1]],
-                [move[0]+1, move[1]],
-                [move[0]-1, move[1]+1],
-                [move[0],   move[1]+1]]
+        return [move-(self.board_dim),
+                move-(self.board_dim-1),
+                move-1,
+                move+1,
+                move+(self.board_dim-1),
+                move+(self.board_dim)]
 
-    def _check_win(self, move: list) -> int:
+    def check_win(self, move: int) -> bool:
         """
         Check if the game has been won.
 
@@ -119,12 +137,11 @@ class Hex:
         bool: True if the game has been won by player who made move
         """
 
-        assert(self.board[move[0]][move[1]] == BLACK
-               or self.board[move[0]][move[1]] == WHITE)
+        assert(self.board[move] == BLACK or self.board[move] == WHITE)
 
         stack = [move]
         visited = {str(move)}  # Don't add already searched moves to stack
-        color = self.board[move[0]][move[1]]
+        color = self.board[move]
 
         touch_left = False   # Is a move found on left side for player?
         touch_right = False  # Is a move found on right side for player?
@@ -133,40 +150,41 @@ class Hex:
             cur_move = stack.pop()
 
             if color == BLACK:
-                if cur_move[0] == 0:
+                if cur_move < self.board_dim:
                     if touch_right:
                         return True
                     touch_left = True
-                elif cur_move[0] == self.size-1:
+                    continue
+                elif cur_move > self.board_size-self.board_dim:
                     if touch_left:
                         return True
                     touch_right = True
+                    continue
             else:
-                if cur_move[1] == 0:
+                if cur_move % self.board_dim == 0:
                     if touch_right:
                         return True
                     touch_left = True
-                elif cur_move[1] == self.size-1:
+                    continue
+                elif (cur_move+1) % self.board_dim == 0:
                     if touch_left:
                         return True
                     touch_right = True
+                    continue
 
             neighbours = self._get_neighbours(cur_move)
 
             for n in neighbours:
-                if (n[0] >= 0 and n[0] < self.size
-                        and n[1] >= 0 and n[1] < self.size):
-                    if (not str(n) in visited
-                            and self.board[n[0]][n[1]] == color):
-                        stack.append(n)
-                        visited.add(str(n))
+                if not str(n) in visited and self.board[n] == color:
+                    stack.append(n)
+                    visited.add(str(n))
 
         return False
 
-    def copy(self) -> "Hex":
+    def copy(self) -> "Hex0":
         """Return copy"""
 
-        game_copy = Hex(self.size)
+        game_copy = Hex0(self.game_dim)
         game_copy.board = deepcopy(self.board)
         game_copy.current_player = self.current_player
 
@@ -174,26 +192,6 @@ class Hex:
 
 
 if __name__ == "__main__":
-    game = Hex(3)
-    print(str(game))
-
-    print(game.play_move([2, 2]))
-    print(str(game))
-
-    print(game.play_move([2, 0]))
-    print(str(game))
-
-    print(game.play_move([1, 1]))
-    print(str(game))
-
-    print(game.play_move([0, 2]))
-    print(str(game))
-
-    print(game.play_move([0, 1]))
-    print(str(game))
-
-    print(game.play_move([2, 1]))
-    print(str(game))
-
-    print(game.play_move([1, 2]))
-    print(str(game))
+    game = Hex0(8)
+    #print(game)
+    print(game.board)

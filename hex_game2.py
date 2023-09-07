@@ -14,11 +14,11 @@
 from copy import deepcopy
 import numpy as np
 
-from hex_game1 import Hex1, BLANK, BLACK, WHITE, BORDER
+from hex_game0 import Hex0, BLANK, BLACK, WHITE, BORDER
 from union_find import UnionFind
 
 
-class Hex2(Hex1):
+class Hex2(Hex0):
     def __init__(self, game_dim: int, is_copy: bool = False):
         self.game_dim = game_dim
         self.board_dim = self.game_dim + 2
@@ -116,7 +116,7 @@ class Hex2(Hex1):
 
         return False
 
-    def copy(self) -> "Hex1":
+    def copy(self) -> "Hex2":
         """Return copy"""
 
         game_copy = Hex2(self.game_dim, is_copy=True)

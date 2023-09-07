@@ -1,6 +1,5 @@
 import hex_game0
 import hex_game1
-import hex_game1_1
 import hex_game2
 from hex_game0 import BLACK, WHITE, BLANK
 import mcts0
@@ -11,7 +10,7 @@ import cProfile
 
 size = 8
 previous_game = None
-version = "2"  # "0" or "1" or "1.1" or "2"
+version = "2"  # "0" or "1" or "2"
 
 def coord_to_move(coord: str) -> list:
     """convert coord in the form a1 to list index"""
@@ -21,7 +20,8 @@ def coord_to_move(coord: str) -> list:
             col -= 1
         row = int(coord[1:])-1
         
-        return [row, col]
+        #return [row, col]
+        return (row+1) * (size+2) + col+1
     except:
         print("invalid coordinate")
 
@@ -57,21 +57,17 @@ def command_loop(game):
                 global size
                 size = int(args[1])
                 if version == "0":
-                    game = hex_game0.Hex(size)
+                    game = hex_game0.Hex0(size)
                 elif version == "1.0" or version == "1":
                     game = hex_game1.Hex1(size)
-                elif version == "1.1":
-                    game = hex_game1_1.Hex1_1(size)
                 elif version == "2":
                     game = hex_game2.Hex2(size)
             elif args[0] == "reset":
                 previous_game = game.copy()
                 if version == "0":
-                    game = hex_game0.Hex(size)
+                    game = hex_game0.Hex0(size)
                 elif version == "1.0" or version == "1":
                     game = hex_game1.Hex1(size)
-                elif version == "1.1":
-                    game = hex_game1_1.Hex1_1(size)
                 elif version == "2":
                     game = hex_game2.Hex2(size)
             elif args[0] == "undo":
@@ -107,11 +103,9 @@ def command_loop(game):
 if __name__=="__main__":
     print("version: ", version)
     if version == "0":
-        game = hex_game0.Hex(size)
+        game = hex_game0.Hex0(size)
     elif version == "1.0" or version == "1":
         game = hex_game1.Hex1(size)
-    elif version == "1.1":
-        game = hex_game1_1.Hex1_1(size)
     elif version == "2":
         game = hex_game2.Hex2(size)
     command_loop(game)
