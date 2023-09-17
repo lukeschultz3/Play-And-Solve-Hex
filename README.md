@@ -38,3 +38,10 @@ There are different implementations of Hex, and MCTS given.
 | Hex2 | `hex_game2.py` | 1d numpy array representation, UnionFind win checking |
 | MCTS0 | `mcts0.py` | Standard MCTS implementation |
 | MCTS1 | `mcts1.py` | Backs up proven wins and loses |
+
+## TODO
+
+1. Setup testsuit
+2. Debugging / verbose output
+3. Simple bridges
+4. Transposition Table
