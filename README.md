@@ -1,15 +1,18 @@
 # MCTS-Hex
 
 ## Contributors
-Luke Schultz
-Kamillah Hasham
-Zhihong Piao
+
+Luke Schultz <br>
+Kamillah Hasham <br>
+Zhihong Piao <br>
 
 ## Makefile
+
 `make runs`
 executes main.py which starts the CLI
 
 ## CLI Instructions
+
 | Command | Description | Example |
 | --- | --- | --- |
 | `x <column><row>` | makes x move at (column, row) | `x a4` |
