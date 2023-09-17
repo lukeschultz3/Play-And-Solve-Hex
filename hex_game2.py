@@ -70,9 +70,6 @@ class Hex2(Hex0):
         Parameters:
         move (int): Position of move
         player (int): WHITE or BLACK, player to move
-
-        Returns:
-        bool: True if game has been won
         """
 
         if type(move) is list:
@@ -89,9 +86,7 @@ class Hex2(Hex0):
             if self.board[neighbour_move] == player:
                 self.union_find.union(neighbour_move, move)
 
-        return self.check_win()
-
-    def check_win(self) -> bool:
+    def check_win(self, *args) -> bool:
         """
         Check if the game has been won.
 

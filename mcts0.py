@@ -60,7 +60,8 @@ class TreeNode0:
         moves = game_copy.get_legal_moves()
         while len(moves) > 0:
             move_index = random.randint(0, len(moves)-1)  # Select random move
-            won = game_copy.play_move(moves[move_index], player)
+            game_copy.play_move(moves[move_index], player)
+            won = game_copy.check_win(moves[move_index])
 
             if won:
                 break
@@ -86,7 +87,8 @@ class RootNode0(TreeNode0):
 
         for move in self.moves:
             game_copy = self.game.copy()
-            won = game_copy.play_move(move, self.player)
+            game_copy.play_move(move, self.player)
+            won = game_copy.check_win(move)
 
             if won:
                 return move

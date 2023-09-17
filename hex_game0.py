@@ -93,9 +93,6 @@ class Hex0:
         Parameters:
         move (int): Position of move
         player (int): WHITE or BLACK, player to move
-
-        Returns:
-        bool: True if game has been won
         """
 
         assert(self.board[move] == BLANK)
@@ -105,8 +102,6 @@ class Hex0:
 
         self.board[move] = player
         self.current_player = 3 - self.current_player  # Switch player
-
-        return self.check_win(move)
 
     def clear_move(self, pos: int):
         """Set a tile at pos to BLANK."""

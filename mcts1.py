@@ -19,7 +19,8 @@ class TreeNode1(TreeNode0):
 
         for move in self.moves:
             game_copy = self.game.copy()
-            won = game_copy.play_move(move, self.player)
+            game_copy.play_move(move, self.player)
+            won = game_copy.check_win(move)
             self.children.append(
                 TreeNode1(game_copy, 3-self.player, move, self)
             )
@@ -63,7 +64,8 @@ class RootNode1(TreeNode1):
 
         for move in self.moves:
             game_copy = self.game.copy()
-            won = game_copy.play_move(move, self.player)
+            game_copy.play_move(move, self.player)
+            won = game_copy.check_win(move)
 
             if won:
                 return move
