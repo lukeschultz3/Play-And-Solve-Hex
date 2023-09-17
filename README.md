@@ -25,3 +25,16 @@ executes main.py which starts the CLI
 | `mcts <player>` | runs Monte Carlo Tree Search to make move for given player | `mcts x` |
 | `gameversion <version>` | selects the version of board implementation | `gameversion 2` |
 | `mctsversion <version>` | selects the version of mcts implementation | `mctsversion 0` |
+| `exit`, `quit`, `q` | exits the CLI | |
+
+## Versions
+
+There are different implementations of Hex, and MCTS given.
+
+| Version | File | Description |
+| --- | --- | --- |
+| Hex0 | `hex_game0.py` | 1d list representation, DFS win checking |
+| Hex1 | `hex_game1.py` | 1d numpy array representation, DFS win checking |
+| Hex2 | `hex_game2.py` | 1d numpy array representation, UnionFind win checking |
+| MCTS0 | `mcts0.py` | Standard MCTS implementation |
+| MCTS1 | `mcts1.py` | Backs up proven wins and loses |
