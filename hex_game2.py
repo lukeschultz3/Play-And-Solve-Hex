@@ -1,5 +1,6 @@
 # Created by Luke Schultz
-# Winter 2023
+# Fall 2022, Winter 2023, Spring 2023, Summer 2023, Fall 2023
+# Written with the help of GitHub Copilot
 #
 # 1d numpy array board representation.
 # Board Representation:
