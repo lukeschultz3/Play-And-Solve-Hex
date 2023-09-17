@@ -35,7 +35,7 @@ class Hex0:
         self.board[-1] = BORDER
 
         # Set BLACK sides to contain BLACK pieces
-        for i in range(1, self.board_dim-1): # Left/top
+        for i in range(1, self.board_dim-1):  # Left/top
             self.board[i] = BLACK
         for i in range(self.board_size-self.game_dim-1, self.board_size-1):
             self.board[i] = BLACK  # Right/bottom
@@ -49,7 +49,7 @@ class Hex0:
                        self.board_dim*(self.board_dim-1),
                        self.board_dim):  # Right side
             self.board[i] = WHITE
-        
+
         self.current_player = BLACK
 
     def __str__(self) -> str:
@@ -184,9 +184,3 @@ class Hex0:
         game_copy.current_player = self.current_player
 
         return game_copy
-
-
-if __name__ == "__main__":
-    game = Hex0(8)
-    #print(game)
-    print(game.board)

@@ -43,7 +43,7 @@ class Hex1(Hex0):
                        self.board_dim*(self.board_dim-1),
                        self.board_dim):  # Right side
             self.board[i] = WHITE
-        
+
         self.current_player = BLACK
 
     def copy(self) -> "Hex1":

@@ -36,6 +36,8 @@ class TreeNode0:
         self.is_leaf = False
 
     def backpropagate(self, won: bool):
+        """Backpropagate simulation results."""
+
         node = self
         while node is not None:
             node.sims += 1

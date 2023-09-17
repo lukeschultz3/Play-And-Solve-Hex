@@ -13,6 +13,7 @@ mctsversion = 1  # 0 or 1
 boardversions = [hex_game0.Hex0, hex_game1.Hex1, hex_game2.Hex2]
 mctsversions = [mcts0.Mcts0, mcts1.Mcts1]
 
+
 def coord_to_move(coord: str) -> list:
     """convert coord in the form a1 to list index"""
     assert(ord(coord[0]) >= 97 and ord(coord[0]) <= 122)
@@ -20,8 +21,9 @@ def coord_to_move(coord: str) -> list:
     if col >= 9:
         col -= 1
     row = int(coord[1:])-1
-    
+
     return (row+1) * (size+2) + col+1
+
 
 def command_loop(game):
     global size
@@ -114,6 +116,6 @@ def command_loop(game):
             print("invalid command, see readme for list of commands")
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     game = boardversions[boardversion](size)
     command_loop(game)

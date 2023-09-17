@@ -3,10 +3,10 @@
 
 
 import time
-import random
 from math import sqrt, log
 
 from mcts0 import TreeNode0, Mcts0
+
 
 class TreeNode1(TreeNode0):
     def __init__(self, game, player: int, move=None, parent=None):
@@ -31,6 +31,8 @@ class TreeNode1(TreeNode0):
         self.is_leaf = False
 
     def backpropagate(self, result: int):
+        """Backpropagate simulation results."""
+
         node = self
         while node is not None:
             node.sims += 1
@@ -107,7 +109,7 @@ class Mcts1(Mcts0):
                 best_node = node
                 most_visits = node.sims
 
-        if best_node is None: 
+        if best_node is None:
             # all moves are losing, choose the one with the most visits
             for node in self.root_node.children:
                 if most_visits is None or node.sims > most_visits:
@@ -169,8 +171,8 @@ class Mcts1(Mcts0):
                 return child
 
             # calculate UCT, update if best
-            mean_result = child.results / child.sims
-            uct = mean_result+(self.c*sqrt(log(self.root_node.sims)/child.sims))
+            mean_res = child.results / child.sims
+            uct = mean_res+(self.c*sqrt(log(self.root_node.sims)/child.sims))
             if best_uct is None or uct > best_uct:
                 best_uct = uct
                 best_child = child
