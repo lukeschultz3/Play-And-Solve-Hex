@@ -6,66 +6,31 @@ import time
 import random
 from math import sqrt, log
 
+from mcts0 import TreeNode0, Mcts0
 
-class TreeNode:
+class TreeNode1(TreeNode0):
     def __init__(self, game, player: int, move=None, parent=None):
-        self.game = game      # Hex object
-        self.player = player  # Player to make move
-        self.move = move      # Previous move
-        self.parent = parent  # Parent node, None if root
+        super().__init__(game, player, move, parent)
 
         self.results = 0  # +1 for black win, -1 for white win
-        self.sims = 0  # Number of simulations
 
-        self.generated_children = False  # True if node has been expanded
-        self.children = []               # List of child nodes
-
-        # Legal moves from this position
-        self.moves = self.game.get_legal_moves()
-
-    def generate_children(self):
+    def expand_node(self):
         """Generate children of this mode."""
 
         for move in self.moves:
             game_copy = self.game.copy()
             won = game_copy.play_move(move, self.player)
             self.children.append(
-                TreeNode(game_copy, 3-self.player, move, self)
+                TreeNode1(game_copy, 3-self.player, move, self)
             )
 
             if won:
-                # backpropagate
-                node = self.children[-1]
-                result = float('inf')
-                while node is not None:
-                    if result == float('inf') and node != self.children[-1]:
-                        for children in node.children:
-                            if children.results != float('-inf'):
-                                result = 1
-                                break
+                self.backpropagate(self.children[-1], float('inf'))
 
-                    node.results += result
+        self.is_leaf = False
 
-                    if result == float('inf'):
-                        result = float('-inf')
-                    elif result == float('-inf'):
-                        result = float('inf')
-                    else:
-                        result = 1-result
-
-                    node = node.parent
-
-        self.generated_children = True
-
+    """
     def rollout(self) -> bool:
-        """
-        Perform a simulation.
-        Selects moves uniformly random.
-
-        Returns:
-        bool: True if self.player won
-        """
-
         game_copy = self.game.copy()
         player = self.player  # player to move
         moves = game_copy.get_legal_moves()
@@ -80,13 +45,14 @@ class TreeNode:
             moves.pop()
             player = 3 - player  # invert color / switch player
 
-        if player != self.player:  # self.player won
+        if player != self.player:  # parent player won
             return 1
-        else:  # self.player lost
+        else:  # parent player lost
             return 0
+    """
 
 
-class RootNode(TreeNode):
+class RootNode(TreeNode1):
     def generate_children(self):
         """
         Generate children of this node.
@@ -103,14 +69,14 @@ class RootNode(TreeNode):
                 return move
 
             self.children.append(
-                TreeNode(game_copy, 3-self.player, move, self)
+                TreeNode1(game_copy, 3-self.player, move, self)
             )
 
         self.generated_children = True
         return None
 
 
-class Mcts:
+class Mcts1(Mcts0):
     # MCTS code largely taken from
     # https://www.geeksforgeeks.org/ml-monte-carlo-tree-search-mcts/
     # November 27, 2022
@@ -164,92 +130,32 @@ class Mcts:
         end_time = time.time() + 15
 
         while time.time() < end_time:
-            leaf = self.traverse(self.root_node)  # traverse
+            leaf = self.traverse_and_expand(self.root_node)  # traverse
             result = leaf.rollout()  # rollout
-
-            # backpropagate
-            node = leaf
-            while node is not None:
-                node.sims += 1
-
-                if result == float('inf') and node != leaf:
-                    for children in node.children:
-                        if children.results != float('-inf'):
-                            result = 1
-                            break
-                elif result == float('inf') and node.parent is None:
-                    return node.move
-
-                node.results += result
-
-                #result *= -1
-                if result == float('inf'):
-                    result = float('-inf')
-                elif result == float('-inf'):
-                    result = float('inf')
-                else:
-                    result = 1-result
-
-                node = node.parent
+            self.backpropagate(leaf, result)  # backpropagate
 
         for child in self.root_node.children:
             print(child.move, child.sims, child.results)
         return self.get_best_move()
 
-    def best_uct(self, node: TreeNode) -> TreeNode:
-        """
-        Return the next move for traversal.
+    def backpropagate(self, leaf: TreeNode1, result: int):
+        node = leaf
+        while node is not None:
+            node.sims += 1
 
-        If node is a root, return node.
-        If there is a child of node that has not been simulated, return child.
-        Otherwise, return child with best uct score.
+            if result == float('inf') and node != leaf:
+                for children in node.children:
+                    if children.results != float('-inf'):
+                        result = 1
+                        break
+            elif result == float('inf') and node.parent is None:
+                return node.move
 
-        Arguments:
-        node (TreeNode): Node in tree to find child to traverse for
+            node.results += result
 
-        Returns:
-        TreeNode: child to traverse
-        """
+            if result == float('inf') or result == float('-inf'):
+                result *= -1
+            else:
+                result = 1-result
 
-        if len(node.moves) == 0:
-            return node  # if terminal node, return node
-
-        best_uct = None
-        best_child = None
-
-        for child in node.children:
-            if child.sims == 0:
-                # if the children of the node have not been
-                # fully explored, then explore a move that
-                # hasn't been before
-                return child
-
-            # calculate UCT, update if best
-            mean_result = child.results / child.sims
-            uct = mean_result+(self.c*sqrt(log(self.root_node.sims)/child.sims))
-            if best_uct is None or uct > best_uct:
-                best_uct = uct
-                best_child = child
-
-        # return best uct
-        return best_child
-
-    def traverse(self, node: TreeNode):
-        """
-        Traverse tree and find node to simulate.
-
-        Arguments:
-        node (TreeNode): Root (first move) of tree
-
-        Returns:
-        Node (TreeNode): move to run simulation on
-        """
-
-        while node.generated_children:
-            node = self.best_uct(node)
-
-        if len(node.moves) > 0 and node.sims > 0:
-            node.generate_children()
-            node = random.choice(node.children)
-
-        return node
+            node = node.parent
