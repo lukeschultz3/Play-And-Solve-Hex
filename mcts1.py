@@ -138,8 +138,10 @@ class Mcts1(Mcts0):
             result = leaf.rollout()  # rollout
             leaf.backpropagate(result)  # backpropagate
 
+        """
         for child in self.root_node.children:
             print(child.move, child.sims, child.results)
+        """
         return self.get_best_move()
 
     def best_uct(self, node: TreeNode1) -> TreeNode1:
