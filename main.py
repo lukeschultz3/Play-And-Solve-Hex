@@ -1,117 +1,121 @@
 import hex_game0
 import hex_game1
-import hex_game1_1
 import hex_game2
 from hex_game0 import BLACK, WHITE, BLANK
 import mcts0
 import mcts1
-import pns0
 
-import cProfile
-
-size = 8
+size = 6
 previous_game = None
-version = "2"  # "0" or "1" or "1.1" or "2"
+boardversion = 2  # 0 or 1 or 2
+mctsversion = 1  # 0 or 1
+
+boardversions = [hex_game0.Hex0, hex_game1.Hex1, hex_game2.Hex2]
+mctsversions = [mcts0.Mcts0, mcts1.Mcts1]
+
 
 def coord_to_move(coord: str) -> list:
     """convert coord in the form a1 to list index"""
-    try:
-        col = ord(coord[0]) - 97
-        if col >= 9:
-            col -= 1
-        row = int(coord[1:])-1
-        
-        return [row, col]
-    except:
-        print("invalid coordinate")
+    assert(ord(coord[0]) >= 97 and ord(coord[0]) <= 122)
+    col = ord(coord[0]) - 97
+    if col >= 9:
+        col -= 1
+    row = int(coord[1:])-1
+
+    return (row+1) * (size+2) + col+1
+
 
 def command_loop(game):
+    global size
+    global previous_game
+    global boardversion
+    global mctsversion
+
     command = None
     while command != "exit" and command != "quit" and command != "q":
         print("= ", end="")
         command = input().lower()
-        
-        if command == "":
+
+        if command.replace(" ", "") == "":
             continue
 
-        args = command.split()
-        try:
-            if args[0] == "x":
-                previous_game = game.copy()
+        args = command.lower().split()
+        if args[0] == "x" or args[0] == "o" or args[0] == ".":
+            try:
                 move = coord_to_move(args[1])
-                game.play_move(move, BLACK)
-                print(str(game))
-            elif args[0] == "o":
                 previous_game = game.copy()
-                move = coord_to_move(args[1])
-                game.play_move(move, WHITE)
-                print(str(game))
-            elif args[0] == ".":
-                previous_game = game.copy()
-                move = coord_to_move(args[1])
-                game.clear_move(move)
-                print(str(game))
-            elif args[0] == "show":
-                print(str(game))
-            elif args[0] == "size":
-                global size
-                size = int(args[1])
-                if version == "0":
-                    game = hex_game0.Hex(size)
-                elif version == "1.0" or version == "1":
-                    game = hex_game1.Hex1(size)
-                elif version == "1.1":
-                    game = hex_game1_1.Hex1_1(size)
-                elif version == "2":
-                    game = hex_game2.Hex2(size)
-            elif args[0] == "reset":
-                previous_game = game.copy()
-                if version == "0":
-                    game = hex_game0.Hex(size)
-                elif version == "1.0" or version == "1":
-                    game = hex_game1.Hex1(size)
-                elif version == "1.1":
-                    game = hex_game1_1.Hex1_1(size)
-                elif version == "2":
-                    game = hex_game2.Hex2(size)
-            elif args[0] == "undo":
-                game = previous_game
-                print(str(game))
-            elif args[0] == "version":
-                pass
-            elif args[0] == "mcts":
-                if args[1] == "x":
-                    previous_game = game.copy()
-                    mcts = mcts1.Mcts(game, BLACK)
-                    move = mcts.monte_carlo_tree_search()
-                    #cProfile.runctx('mcts.monte_carlo_tree_search()', globals(), locals())
-                    #exit()
-                    print("number of simulations performed:", mcts.root_node.sims)
+                if args[0] == "x":
                     game.play_move(move, BLACK)
-                    print(str(game))
-                elif args[1] == "o":
-                    previous_game = game.copy()
-                    mcts = mcts1.Mcts(game, WHITE)
-                    move = mcts.monte_carlo_tree_search()
-                    print("number of simulations performed:", mcts.root_node.sims)
+                elif args[0] == "o":
                     game.play_move(move, WHITE)
-                    print(str(game))
-            elif args[0] == "pns":
-                if args[1] == "x":
-                    pns = pns0.PNS(game, BLACK)
-                    pns.pns()
-        except IndexError:
-            continue
+                elif args[0] == ".":
+                    game.clear_move(move)
+                print(str(game))
+            except:
+                print("invalid coordinate")
+                continue
+        elif args[0] == "show":
+            print(str(game))
+        elif args[0] == "size":
+            global size
+            try:
+                size = int(args[1])
+            except:
+                print("invalid size")
+                continue
+            previous_game = game.copy()
+            game = boardversions[boardversion](size)
+            print(str(game))
+        elif args[0] == "reset":
+            previous_game = game.copy()
+            game = boardversions[boardversion](size)
+            print(str(game))
+        elif args[0] == "undo":
+            game = previous_game
+            print(str(game))
+        elif args[0] == "gameversion":
+            try:
+                assert(0 <= int(args[1]) <= 2)
+                gameversion = int(args[1])
+            except:
+                print("invalid game version, see readme for list of versions")
+                continue
+            previous_game = game.copy()
+            game = boardversions[gameversion](size)
+            print(str(game))
+        elif args[0] == "mctsversion":
+            try:
+                assert(0 <= int(args[1]) <= 1)
+                mctsversion = int(args[1])
+            except:
+                print("invalid mcts version, see readme for list of versions")
+                continue
+        elif args[0] == "mcts":
+            try:
+                assert(args[1] == "x" or args[1] == "o")
+            except:
+                print("invalid player, see readme for list of players")
+                continue
+
+            previous_game = game.copy()
+
+            if args[1] == "x":
+                mcts = mctsversions[mctsversion](game, BLACK)
+                move = mcts.monte_carlo_tree_search()
+                print("number of simulations performed:", mcts.root_node.sims)
+                game.play_move(move, BLACK)
+            elif args[1] == "o":
+                previous_game = game.copy()
+                mcts = mctsversions[mctsversion](game, WHITE)
+                move = mcts.monte_carlo_tree_search()
+                print("number of simulations performed:", mcts.root_node.sims)
+                game.play_move(move, WHITE)
+
+            print(str(game))
+        elif args[0] != "exit" and args[0] != "quit" and args[0] != "q":
+            print("invalid command, see readme for list of commands")
 
 
-if __name__=="__main__":
-    print("version: ", version)
-    if version == "0":
-        game = hex_game0.Hex(size)
-    elif version == "1.0" or version == "1":
-        game = hex_game1.Hex1(size)
-    elif version == "1.1":
-        game = hex_game1_1.Hex1_1(size)
-    elif version == "2":
-        game = hex_game2.Hex2(size)
+if __name__ == "__main__":
+    game = boardversions[boardversion](size)
     command_loop(game)

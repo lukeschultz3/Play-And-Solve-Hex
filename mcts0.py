@@ -7,7 +7,7 @@ import random
 from math import sqrt, log
 
 
-class TreeNode:
+class TreeNode0:
     def __init__(self, game, player: int, move=None, parent=None):
         self.game = game      # Hex object
         self.player = player  # Player to make move
@@ -17,23 +17,36 @@ class TreeNode:
         self.wins = 0  # Number of winning simulations
         self.sims = 0  # Number of simulations
 
-        self.generated_children = False  # True if node has been expanded
-        self.children = []               # List of child nodes
+        self.is_leaf = True  # False is node has been expanded
+        self.children = []   # List of child nodes
 
         # Legal moves from this position
         self.moves = self.game.get_legal_moves()
 
-    def generate_children(self):
-        """Generate children of this mode."""
+    def expand_node(self):
+        """Generate children of this node."""
 
         for move in self.moves:
             game_copy = self.game.copy()
             game_copy.play_move(move, self.player)
             self.children.append(
-                TreeNode(game_copy, 3-self.player, move, self)
+                TreeNode0(game_copy, 3-self.player, move, self)
             )
 
-        self.generated_children = True
+        self.is_leaf = False
+
+    def backpropagate(self, won: bool):
+        """Backpropagate simulation results."""
+
+        node = self
+        while node is not None:
+            node.sims += 1
+
+            if won:
+                node.wins += 1
+            won = not won
+
+            node = node.parent
 
     def rollout(self) -> bool:
         """
@@ -41,7 +54,7 @@ class TreeNode:
         Selects moves uniformly random.
 
         Returns:
-        bool: True if self.player won
+        bool: True if parent player won
         """
 
         game_copy = self.game.copy()
@@ -49,7 +62,8 @@ class TreeNode:
         moves = game_copy.get_legal_moves()
         while len(moves) > 0:
             move_index = random.randint(0, len(moves)-1)  # Select random move
-            won = game_copy.play_move(moves[move_index], player)
+            game_copy.play_move(moves[move_index], player)
+            won = game_copy.check_win(moves[move_index])
 
             if won:
                 break
@@ -58,14 +72,14 @@ class TreeNode:
             moves.pop()
             player = 3 - player  # invert color / switch player
 
-        if player != self.player:  # self.player won
+        if player != self.player:  # parent player won
             return True
-        else:  # self.player lost
+        else:  # parent player lost
             return False
 
 
-class RootNode(TreeNode):
-    def generate_children(self):
+class RootNode0(TreeNode0):
+    def expand_node(self):
         """
         Generate children of this node.
 
@@ -75,27 +89,28 @@ class RootNode(TreeNode):
 
         for move in self.moves:
             game_copy = self.game.copy()
-            won = game_copy.play_move(move, self.player)
+            game_copy.play_move(move, self.player)
+            won = game_copy.check_win(move)
 
             if won:
                 return move
 
             self.children.append(
-                TreeNode(game_copy, 3-self.player, move, self)
+                TreeNode0(game_copy, 3-self.player, move, self)
             )
 
         self.generated_children = True
         return None
 
 
-class Mcts:
+class Mcts0:
     # MCTS code largely taken from
     # https://www.geeksforgeeks.org/ml-monte-carlo-tree-search-mcts/
     # November 27, 2022
 
     def __init__(self, game, player):
-        self.root_node = RootNode(game, player)
-        self.winning_move = self.root_node.generate_children()
+        self.root_node = RootNode0(game, player)
+        self.winning_move = self.root_node.expand_node()
 
         self.c = 0.3  # used for UCT
 
@@ -132,24 +147,13 @@ class Mcts:
         end_time = time.time() + 15
 
         while time.time() < end_time:
-            leaf = self.traverse(self.root_node)  # traverse
+            leaf = self.traverse_and_expand(self.root_node)  # traverse
             won = leaf.rollout()  # rollout
-
-            # backpropagate
-            node = leaf
-            while node is not None:
-                node.sims += 1
-
-                if won and node.player == leaf.player:
-                    node.wins += 1
-                elif not won and node.player != leaf.player:
-                    node.wins += 1
-
-                node = node.parent
+            leaf.backpropagate(won)  # backpropagate
 
         return self.get_best_move()
 
-    def best_uct(self, node: TreeNode) -> TreeNode:
+    def best_uct(self, node: TreeNode0) -> TreeNode0:
         """
         Return the next move for traversal.
 
@@ -187,7 +191,7 @@ class Mcts:
         # return best uct
         return best_child
 
-    def traverse(self, node: TreeNode):
+    def traverse_and_expand(self, node: TreeNode0):
         """
         Traverse tree and find node to simulate.
 
@@ -198,11 +202,11 @@ class Mcts:
         Node (TreeNode): move to run simulation on
         """
 
-        while node.generated_children:
+        while not node.is_leaf:
             node = self.best_uct(node)
 
         if len(node.moves) > 0 and node.sims > 0:
-            node.generate_children()
+            node.expand_node()
             node = random.choice(node.children)
 
         return node
