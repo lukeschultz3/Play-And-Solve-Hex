@@ -35,6 +35,17 @@ class TreeNode0:
 
         self.is_leaf = False
 
+    def backpropagate(self, won: bool):
+        node = self
+        while node is not None:
+            node.sims += 1
+
+            if won:
+                node.wins += 1
+            won = not won
+
+            node = node.parent
+
     def rollout(self) -> bool:
         """
         Perform a simulation.
@@ -64,7 +75,7 @@ class TreeNode0:
             return False
 
 
-class RootNode(TreeNode0):
+class RootNode0(TreeNode0):
     def expand_node(self):
         """
         Generate children of this node.
@@ -94,7 +105,7 @@ class Mcts0:
     # November 27, 2022
 
     def __init__(self, game, player):
-        self.root_node = RootNode(game, player)
+        self.root_node = RootNode0(game, player)
         self.winning_move = self.root_node.expand_node()
 
         self.c = 0.3  # used for UCT
@@ -134,20 +145,9 @@ class Mcts0:
         while time.time() < end_time:
             leaf = self.traverse_and_expand(self.root_node)  # traverse
             won = leaf.rollout()  # rollout
-            self.backpropagate(leaf, won)  # backpropagate
+            leaf.backpropagate(won)  # backpropagate
 
         return self.get_best_move()
-
-    def backpropagate(self, leaf: TreeNode0, won: bool):
-        node = leaf
-        while node is not None:
-            node.sims += 1
-
-            if won:
-                node.wins += 1
-            won = not won
-
-            node = node.parent
 
     def best_uct(self, node: TreeNode0) -> TreeNode0:
         """

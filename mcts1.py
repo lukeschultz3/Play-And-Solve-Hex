@@ -25,35 +25,35 @@ class TreeNode1(TreeNode0):
             )
 
             if won:
-                self.backpropagate(self.children[-1], float('inf'))
+                self.children[-1].backpropagate(float('inf'))
 
         self.is_leaf = False
 
-    """
-    def rollout(self) -> bool:
-        game_copy = self.game.copy()
-        player = self.player  # player to move
-        moves = game_copy.get_legal_moves()
-        while len(moves) > 0:
-            move_index = random.randint(0, len(moves)-1)  # Select random move
-            won = game_copy.play_move(moves[move_index], player)
+    def backpropagate(self, result: int):
+        node = self
+        while node is not None:
+            node.sims += 1
 
-            if won:
-                break
+            if result == float('inf') and node != self:
+                for children in node.children:
+                    if children.results != float('-inf'):
+                        result = 1
+                        break
+            elif result == float('inf') and node.parent is None:
+                return node.move
 
-            moves[move_index] = moves[-1]
-            moves.pop()
-            player = 3 - player  # invert color / switch player
+            node.results += result
 
-        if player != self.player:  # parent player won
-            return 1
-        else:  # parent player lost
-            return 0
-    """
+            if result == float('inf') or result == float('-inf'):
+                result *= -1
+            else:
+                result = 1-result
+
+            node = node.parent
 
 
-class RootNode(TreeNode1):
-    def generate_children(self):
+class RootNode1(TreeNode1):
+    def expand_node(self):
         """
         Generate children of this node.
 
@@ -72,7 +72,7 @@ class RootNode(TreeNode1):
                 TreeNode1(game_copy, 3-self.player, move, self)
             )
 
-        self.generated_children = True
+        self.is_leaf = False
         return None
 
 
@@ -82,8 +82,8 @@ class Mcts1(Mcts0):
     # November 27, 2022
 
     def __init__(self, game, player):
-        self.root_node = RootNode(game, player)
-        self.winning_move = self.root_node.generate_children()
+        self.root_node = RootNode1(game, player)
+        self.winning_move = self.root_node.expand_node()
 
         self.c = 0.3  # used for UCT
 
@@ -132,30 +132,46 @@ class Mcts1(Mcts0):
         while time.time() < end_time:
             leaf = self.traverse_and_expand(self.root_node)  # traverse
             result = leaf.rollout()  # rollout
-            self.backpropagate(leaf, result)  # backpropagate
+            leaf.backpropagate(result)  # backpropagate
 
         for child in self.root_node.children:
             print(child.move, child.sims, child.results)
         return self.get_best_move()
 
-    def backpropagate(self, leaf: TreeNode1, result: int):
-        node = leaf
-        while node is not None:
-            node.sims += 1
+    def best_uct(self, node: TreeNode1) -> TreeNode1:
+        """
+        Return the next move for traversal.
 
-            if result == float('inf') and node != leaf:
-                for children in node.children:
-                    if children.results != float('-inf'):
-                        result = 1
-                        break
-            elif result == float('inf') and node.parent is None:
-                return node.move
+        If node is a root, return node.
+        If there is a child of node that has not been simulated, return child.
+        Otherwise, return child with best uct score.
 
-            node.results += result
+        Arguments:
+        node (TreeNode): Node in tree to find child to traverse for
 
-            if result == float('inf') or result == float('-inf'):
-                result *= -1
-            else:
-                result = 1-result
+        Returns:
+        TreeNode: child to traverse
+        """
 
-            node = node.parent
+        if len(node.moves) == 0:
+            return node  # if terminal node, return node
+
+        best_uct = None
+        best_child = None
+
+        for child in node.children:
+            if child.sims == 0:
+                # if the children of the node have not been
+                # fully explored, then explore a move that
+                # hasn't been before
+                return child
+
+            # calculate UCT, update if best
+            mean_result = child.results / child.sims
+            uct = mean_result+(self.c*sqrt(log(self.root_node.sims)/child.sims))
+            if best_uct is None or uct > best_uct:
+                best_uct = uct
+                best_child = child
+
+        # return best uct
+        return best_child

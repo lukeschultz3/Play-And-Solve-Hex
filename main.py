@@ -78,7 +78,7 @@ def command_loop(game):
             elif args[0] == "mcts":
                 if args[1] == "x":
                     previous_game = game.copy()
-                    mcts = mcts1.Mcts1(game, BLACK)
+                    mcts = mcts0.Mcts0(game, BLACK)
                     move = mcts.monte_carlo_tree_search()
                     #cProfile.runctx('mcts.monte_carlo_tree_search()', globals(), locals())
                     #exit()
@@ -87,7 +87,7 @@ def command_loop(game):
                     print(str(game))
                 elif args[1] == "o":
                     previous_game = game.copy()
-                    mcts = mcts1.Mcts1(game, WHITE)
+                    mcts = mcts0.Mcts0(game, WHITE)
                     move = mcts.monte_carlo_tree_search()
                     print("number of simulations performed:", mcts.root_node.sims)
                     game.play_move(move, WHITE)
