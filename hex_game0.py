@@ -87,6 +87,11 @@ class Hex0:
                 legal_moves.append(i)
         return legal_moves
 
+    def get_simulation_moves(self, _) -> list:
+        """Returns list of moves for simulations."""
+
+        return self.get_legal_moves()
+
     def play_move(self, move: int, player: int = None) -> bool:
         """
         Play a move, update the current player, check for win.

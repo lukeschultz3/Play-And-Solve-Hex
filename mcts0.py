@@ -6,6 +6,7 @@ import time
 import random
 from math import sqrt, log
 
+MOVETIME = 15  # seconds
 
 class TreeNode0:
     def __init__(self, game, player: int, move=None, parent=None):
@@ -59,7 +60,7 @@ class TreeNode0:
 
         game_copy = self.game.copy()
         player = self.player
-        moves = game_copy.get_legal_moves()
+        moves = game_copy.get_simulation_moves(player)
         while len(moves) > 0:
             move_index = random.randint(0, len(moves)-1)  # Select random move
             game_copy.play_move(moves[move_index], player)
@@ -144,7 +145,7 @@ class Mcts0:
             return self.winning_move
 
         # return move after set amount of time
-        end_time = time.time() + 15
+        end_time = time.time() + MOVETIME
 
         while time.time() < end_time:
             leaf = self.traverse_and_expand(self.root_node)  # traverse

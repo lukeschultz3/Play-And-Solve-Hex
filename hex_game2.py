@@ -111,6 +111,9 @@ class Hex2(Hex0):
             return True
 
         return False
+    
+    def check_true_win(self, *args) -> bool:
+        return self.check_win()
 
     def copy(self) -> "Hex2":
         """Return copy"""

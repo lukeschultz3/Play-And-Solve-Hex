@@ -5,16 +5,17 @@
 import hex_game0
 import hex_game1
 import hex_game2
+import hex_game3
 from hex_game0 import BLACK, WHITE, BLANK
 import mcts0
 import mcts1
 
 size = 6
 previous_game = None
-boardversion = 2  # 0 or 1 or 2
+boardversion = 3  # 0 or 1 or 2 or 3
 mctsversion = 1  # 0 or 1
 
-boardversions = [hex_game0.Hex0, hex_game1.Hex1, hex_game2.Hex2]
+boardversions = [hex_game0.Hex0, hex_game1.Hex1, hex_game2.Hex2, hex_game3.Hex3]
 mctsversions = [mcts0.Mcts0, mcts1.Mcts1]
 
 
